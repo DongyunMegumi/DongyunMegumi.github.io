@@ -39,7 +39,7 @@
       }
     } catch (e) { /* ignore */ }
 
-    // 3) 已发布 JSON（博客部署场景）
+    // 3) 已发布 JSON（博客部署场景；file:// 下会被 CORS 拦截）
     try {
       const res = await fetch('characters-data.json', { cache: 'no-store' });
       if (res.ok) {
@@ -47,6 +47,13 @@
         const data = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.characters) ? raw.characters : []);
         if (data.length) return data;
       }
+    } catch (e) { /* ignore */ }
+
+    // 4) characters-data.js 兜底（<script> 注入，file:// 本地打开也能读到）
+    try {
+      const payload = window.__PUBLISHED_DATA__;
+      const data = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.characters) ? payload.characters : []);
+      if (data.length) return data;
     } catch (e) { /* ignore */ }
 
     return [];
@@ -224,21 +231,22 @@
 
   /* ---------- 已发布数据仲裁（savedAt 较新者胜出） ---------- */
   async function loadPublishedData() {
+    let data = null;
     try {
       const res = await fetch('characters-data.json', { cache: 'no-store' });
-      if (!res.ok) return;
-      const data = await res.json();
-      if (!data || !Array.isArray(data.characters) || !data.characters.length) return;
-      let localSavedAt = 0;
-      try { localSavedAt = (await localforage.getItem('cs_savedAt')) || 0; } catch (e) { /* ignore */ }
-      if ((data.savedAt || 0) > localSavedAt) {
-        characters = data.characters;
-        try {
-          await localforage.setItem('cs_characters', characters);
-          await localforage.setItem('cs_savedAt', data.savedAt || Date.now());
-        } catch (e) { /* ignore */ }
-      }
-    } catch (e) { /* 无已发布数据，忽略 */ }
+      if (res.ok) data = await res.json();
+    } catch (e) { /* file:// 下 fetch 被拦截，走 js 兜底 */ }
+    if (!data) data = window.__PUBLISHED_DATA__ || null;
+    if (!data || !Array.isArray(data.characters) || !data.characters.length) return;
+    let localSavedAt = 0;
+    try { localSavedAt = (await localforage.getItem('cs_savedAt')) || 0; } catch (e) { /* ignore */ }
+    if ((data.savedAt || 0) > localSavedAt) {
+      characters = data.characters;
+      try {
+        await localforage.setItem('cs_characters', characters);
+        await localforage.setItem('cs_savedAt', data.savedAt || Date.now());
+      } catch (e) { /* ignore */ }
+    }
   }
 
   /* ---------- 发布导出 ---------- */

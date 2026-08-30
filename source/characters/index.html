@@ -68,12 +68,13 @@ layout: false
   <!-- 空状态 -->
   <div class="mm-empty" id="mmEmpty" hidden>
     <p class="mm-empty-title">NO CHARACTER</p>
-    <p class="mm-empty-text">尚未读取到角色数据。<br />请先在角色管理页（character-showcase-v2）创建角色，<br />或将本页与 characters-data.json 一同部署。</p>
+    <p class="mm-empty-text">尚未读取到角色数据。<br />请确认 characters-data.json / characters-data.js 与本页在同一目录，<br />或先在角色管理页（character-showcase-v2）创建角色后点 PUBLISH。</p>
   </div>
 
   <div class="mm-toast" id="mmToast"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+  <script src="characters-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
