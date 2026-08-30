@@ -1,17 +1,25 @@
 {
-  "savedAt": 1788083760397,
+  "savedAt": 1788087104522,
   "characters": [
     {
       "id": 0,
       "nameJp": "キャラクター01",
       "nameRomaji": "CHARACTER 01",
       "quote": "ここに台詞を入力してください",
-      "tags": ["3D Model", "Next-Gen"],
+      "tags": [
+        "3D Model",
+        "Next-Gen"
+      ],
       "desc": "角色设计理念与特点描述。可填写角色的创作背景、设计亮点和制作心得。",
       "story": "在此处填写角色的背景故事或设计说明。",
       "renders": [],
       "wires": [],
-      "tech": { "poly": "12,580", "verts": "6,290", "tool": "Blender / ZBrush", "style": "二次元 / 卡通" },
+      "tech": {
+        "poly": "12,580",
+        "verts": "6,290",
+        "tool": "Blender / ZBrush",
+        "style": "二次元 / 卡通"
+      },
       "mainImg": "assets/images/char-01.png"
     },
     {
@@ -19,12 +27,20 @@
       "nameJp": "キャラクター02",
       "nameRomaji": "CHARACTER 02",
       "quote": "ここに台詞を入力してください",
-      "tags": ["3D Model", "Realistic"],
+      "tags": [
+        "3D Model",
+        "Realistic"
+      ],
       "desc": "角色设计理念与特点描述。可填写角色的创作背景、设计亮点和制作心得。",
       "story": "在此处填写角色的背景故事或设计说明。",
       "renders": [],
       "wires": [],
-      "tech": { "poly": "15,200", "verts": "7,600", "tool": "Maya / ZBrush", "style": "写实 / 影视级" },
+      "tech": {
+        "poly": "15,200",
+        "verts": "7,600",
+        "tool": "Maya / ZBrush",
+        "style": "写实 / 影视级"
+      },
       "mainImg": "assets/images/char-02.jpg"
     },
     {
@@ -32,12 +48,20 @@
       "nameJp": "キャラクター03",
       "nameRomaji": "CHARACTER 03",
       "quote": "ここに台詞を入力してください",
-      "tags": ["3D Model", "Stylized"],
+      "tags": [
+        "3D Model",
+        "Stylized"
+      ],
       "desc": "角色设计理念与特点描述。可填写角色的创作背景、设计亮点和制作心得。",
       "story": "在此处填写角色的背景故事或设计说明。",
       "renders": [],
       "wires": [],
-      "tech": { "poly": "10,800", "verts": "5,400", "tool": "Blender / Substance", "style": "风格化" },
+      "tech": {
+        "poly": "10,800",
+        "verts": "5,400",
+        "tool": "Blender / Substance",
+        "style": "风格化"
+      },
       "mainImg": "assets/images/char-03.png"
     }
   ]
