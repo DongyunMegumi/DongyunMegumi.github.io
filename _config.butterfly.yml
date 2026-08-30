@@ -19,6 +19,7 @@ nav:
 
 menu:
   ホーム: / || fas fa-home
+  キャラ: /characters/ || fas fa-dragon
   アーカイブ: /archives/ || fas fa-archive
   タグ: /tags/ || fas fa-tags
   关于: /about/ || fas fa-user
