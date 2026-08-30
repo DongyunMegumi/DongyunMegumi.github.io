@@ -96,7 +96,7 @@ footer_img: false
 # Website Background
 # Can set it to color, image URL or an array containing colors and/or image URLs
 # If an array is provided, a random background will be selected from the array on each load
-background: '#06040f'
+background: '#f4efe6'
 
 cover:
   # Disable the cover or not
@@ -268,7 +268,7 @@ footer:
   copyright:
     enable: false
     version: false
-  custom_text: 'Dongyun Megumi — 忘れられないように、うまくなりたい'
+  custom_text: '忘れられないように、うまくなりたい ✿ Mochimochi.'
 
 # --------------------------------------
 # Aside Settings
@@ -766,21 +766,21 @@ site_verification:
 
 theme_color:
   enable: true
-  main: "#8b75d7"
-  paginator: "#a992f0"
-  button_hover: "#a992f0"
-  text_selection: "#4a3878"
-  link_color: "#a992f0"
-  meta_color: "#a09abd"
-  hr_color: "#8b75d7"
-  code_foreground: "#a992f0"
-  code_background: "rgba(139,117,215,0.08)"
-  toc_color: "#a992f0"
-  blockquote_padding_color: "#8b75d7"
-  blockquote_background_color: "#8b75d7"
-  scrollbar_color: "#4a3878"
-  meta_theme_color_light: "#06040f"
-  meta_theme_color_dark: "#06040f"
+  main: "#bfa77a"
+  paginator: "#a9685a"
+  button_hover: "#a9685a"
+  text_selection: "#e6dcc8"
+  link_color: "#a9685a"
+  meta_color: "#7a7468"
+  hr_color: "#bfa77a"
+  code_foreground: "#8a6a4f"
+  code_background: "rgba(191,167,122,0.12)"
+  toc_color: "#bfa77a"
+  blockquote_padding_color: "#bfa77a"
+  blockquote_background_color: "#bfa77a"
+  scrollbar_color: "#bfa77a"
+  meta_theme_color_light: "#f4efe6"
+  meta_theme_color_dark: "#f4efe6"
 
 # The user interface setting of category and tag page
 # Choose: index - same as Homepage UI / default - same as archives UI
@@ -813,7 +813,7 @@ preloader:
 enter_transitions: true
 
 # Default display mode - light (default) / dark
-display_mode: dark
+display_mode: light
 
 # Configuration for beautifying the content of the article
 beautify:
@@ -830,13 +830,13 @@ beautify:
 font:
   global_font_size:
   code_font_size:
-  font_family: "'Noto Sans JP', 'PingFang SC', 'Microsoft YaHei', sans-serif"
-  code_font_family: "consolas, Menlo, monospace"
+  font_family: "'Kiwi Maru', 'Zen Maru Gothic', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+  code_font_family: "'Patrick Hand', consolas, Menlo, monospace"
 
 # Font settings for the site title and site subtitle
 blog_title_font:
-  font_link: https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Space+Grotesk:wght@400;600&display=swap
-  font_family: "'Noto Serif JP', serif"
+  font_link: https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Patrick+Hand&display=swap
+  font_family: "'Kiwi Maru', 'Zen Maru Gothic', serif"
 
 # The setting of divider icon
 hr_icon:
@@ -1063,9 +1063,9 @@ inject:
   head:
     - <link rel="preconnect" href="https://fonts.googleapis.com">
     - <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    - <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    - <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     - <link rel="stylesheet" href="/css/custom.css">
-    - <script>document.documentElement.setAttribute('data-theme','dark');try{localStorage.setItem('theme','dark')}catch(e){}</script>
+    - <script>document.documentElement.setAttribute('data-theme','light');try{localStorage.setItem('theme','light')}catch(e){}</script>
   bottom:
 
 # CDN Settings
