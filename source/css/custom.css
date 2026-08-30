@@ -1,0 +1,292 @@
+/* ============================================================
+   custom.css — Dongyun Megumi 作品集博客
+   视觉体系与 character-showcase-v2 完全一致：
+   深空紫背景 / #8b75d7 主色 / Noto Serif JP 标题字体
+   ============================================================ */
+
+:root {
+  /* 与 character-showcase-v2 相同的设计令牌 */
+  --karia-bg:          #06040f;
+  --karia-bg-card:     #0d0a1f;
+  --karia-accent:      #8b75d7;
+  --karia-accent-bri:  #a992f0;
+  --karia-accent-dim:  #4a3878;
+  --karia-text:        #f0ecff;
+  --karia-text-sub:    #a09abd;
+  --karia-border:      rgba(139, 117, 215, 0.18);
+  --karia-border-bri:  rgba(139, 117, 215, 0.45);
+  --karia-gold:        rgba(201, 168, 76, 0.35);
+}
+
+/* ---------- 全局背景：深空紫径向渐变（同 showcase Hero） ---------- */
+body {
+  background: var(--karia-bg) !important;
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% -10%, #1a0d35 0%, #08051a 45%, transparent 100%),
+    radial-gradient(ellipse 50% 40% at 85% 110%, rgba(74, 56, 120, 0.25) 0%, transparent 100%) !important;
+  background-attachment: fixed !important;
+  color: var(--karia-text) !important;
+  font-family: 'Noto Sans JP', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 暗色模式变量覆盖（无论 light/dark 都保持 Karia 暗色系） ---------- */
+[data-theme='light'],
+[data-theme='dark'] {
+  --card-background: var(--karia-bg-card) !important;
+  --font-color: var(--karia-text) !important;
+  --text-highlight-color: var(--karia-text) !important;
+  --background: var(--karia-bg) !important;
+  --btn-bg: var(--karia-accent) !important;
+  --btn-hover-color: #ffffff !important;
+  --btn-color: #ffffff !important;
+  --light-grey: var(--karia-text-sub) !important;
+  --link-color: var(--karia-accent-bri) !important;
+  --link-hover-color: #c4b5fa !important;
+  --text-bg-hover: rgba(139, 117, 215, 0.15) !important;
+}
+
+/* ---------- 导航栏 ---------- */
+#nav {
+  background: rgba(6, 4, 15, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: none !important;
+}
+#nav::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--karia-border), var(--karia-gold), var(--karia-border), transparent);
+}
+#site-name,
+#site-name .title {
+  font-family: 'Noto Serif JP', serif !important;
+  color: var(--karia-text) !important;
+  text-shadow: none !important;
+  letter-spacing: 0.12em;
+}
+#nav .menus_item a,
+#nav .menus_item .site-page {
+  color: var(--karia-text-sub) !important;
+  font-family: 'Noto Sans JP', sans-serif !important;
+  letter-spacing: 0.08em;
+  transition: color 0.3s ease;
+}
+#nav .menus_item a:hover,
+#nav .menus_item .site-page:hover {
+  color: var(--karia-accent-bri) !important;
+}
+#nav .menus_item .site-page::after {
+  background: var(--karia-accent) !important;
+}
+
+/* ---------- 顶部站点信息（无 banner 时的标题区） ---------- */
+#page-header {
+  background: transparent !important;
+}
+#site-info .site-title {
+  font-family: 'Noto Serif JP', serif !important;
+  color: var(--karia-text) !important;
+  text-shadow: 0 4px 24px rgba(139, 117, 215, 0.4) !important;
+}
+#site-info .site-subtitle {
+  color: var(--karia-text-sub) !important;
+  font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif !important;
+  letter-spacing: 0.2em;
+}
+#site-info .site-social-icon,
+#site-info .social-icon {
+  color: var(--karia-accent-bri) !important;
+}
+
+/* ---------- 头像 ---------- */
+.avatar-img {
+  border-radius: 50% !important;
+  border: 1px solid var(--karia-border-bri) !important;
+  box-shadow: 0 0 24px rgba(139, 117, 215, 0.3) !important;
+}
+
+/* ---------- 卡片（文章列表 / 侧栏） ---------- */
+#recent-posts .recent-post-item,
+.card-widget,
+.layout > div:first-child {
+  background: var(--karia-bg-card) !important;
+  border: 1px solid var(--karia-border) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease !important;
+}
+#recent-posts .recent-post-item:hover,
+.card-widget:hover {
+  border-color: var(--karia-border-bri) !important;
+  box-shadow: 0 12px 40px rgba(139, 117, 215, 0.25) !important;
+  transform: translateY(-4px);
+}
+
+/* 文章标题 */
+.recent-post-info .article-title,
+.article-title {
+  color: var(--karia-text) !important;
+  font-family: 'Noto Serif JP', serif !important;
+  letter-spacing: 0.05em;
+}
+.article-title:hover {
+  color: var(--karia-accent-bri) !important;
+}
+.recent-post-info .article-meta,
+.article-meta,
+.post-meta {
+  color: var(--karia-text-sub) !important;
+}
+.recent-post-info .content,
+.content {
+  color: var(--karia-text-sub) !important;
+}
+
+/* ---------- 分页器 ---------- */
+#pagination .pagination .page-number.current,
+#pagination .pagination > *:hover {
+  background: var(--karia-accent) !important;
+  color: #fff !important;
+  border-color: var(--karia-accent) !important;
+}
+
+/* ---------- 侧栏 ---------- */
+.item-headline i,
+.item-headline span {
+  color: var(--karia-accent-bri) !important;
+}
+.card-archive-archive-list-count,
+.card-tag-cloud-count {
+  color: var(--karia-text-sub) !important;
+}
+
+/* ---------- 文章正文 ---------- */
+#article-container {
+  color: var(--karia-text) !important;
+}
+#article-container h1,
+#article-container h2,
+#article-container h3,
+#article-container h4 {
+  font-family: 'Noto Serif JP', serif !important;
+  color: var(--karia-text) !important;
+}
+#article-container h1::before,
+#article-container h2::before {
+  color: var(--karia-accent) !important;
+}
+#article-container a {
+  color: var(--karia-accent-bri) !important;
+  border-bottom: 1px dashed var(--karia-accent-dim) !important;
+}
+#article-container a:hover {
+  color: #c4b5fa !important;
+}
+#article-container blockquote {
+  border-left: 3px solid var(--karia-accent) !important;
+  background: rgba(139, 117, 215, 0.08) !important;
+  color: var(--karia-text-sub) !important;
+}
+#article-container code {
+  background: rgba(139, 117, 215, 0.12) !important;
+  color: var(--karia-accent-bri) !important;
+}
+#article-container table th {
+  background: rgba(139, 117, 215, 0.15) !important;
+  color: var(--karia-text) !important;
+}
+#article-container table td,
+#article-container table th {
+  border: 1px solid var(--karia-border) !important;
+}
+#article-container table tr {
+  background-color: transparent !important;
+}
+#article-container table tr:nth-child(2n) {
+  background-color: rgba(139, 117, 215, 0.05) !important;
+}
+
+/* ---------- 标签 / 分类 ---------- */
+.tag-cloud-list a,
+.card-tag-cloud a {
+  color: var(--karia-text-sub) !important;
+  border: 1px solid var(--karia-border) !important;
+  background: transparent !important;
+}
+.tag-cloud-list a:hover,
+.card-tag-cloud a:hover {
+  color: var(--karia-accent-bri) !important;
+  border-color: var(--karia-border-bri) !important;
+  box-shadow: 0 0 12px rgba(139, 117, 215, 0.25);
+}
+
+/* ---------- 页脚 ---------- */
+#footer {
+  background: transparent !important;
+}
+#footer::before {
+  background: linear-gradient(90deg, transparent, var(--karia-border), var(--karia-gold), var(--karia-border), transparent) !important;
+}
+#footer,
+#footer a,
+#footer .framework-info,
+#footer .footer_custom_text {
+  color: var(--karia-text-sub) !important;
+}
+
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--karia-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--karia-accent-dim);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--karia-accent);
+}
+
+/* ---------- 文字选中 ---------- */
+::selection {
+  background: var(--karia-accent-dim) !important;
+  color: var(--karia-text) !important;
+}
+
+/* ---------- 右下角悬浮按钮 ---------- */
+#rightside > div > button,
+#rightside .rs-button {
+  background: var(--karia-bg-card) !important;
+  border: 1px solid var(--karia-border) !important;
+  color: var(--karia-accent-bri) !important;
+}
+
+/* ---------- 搜索 / 归档等页面杂项 ---------- */
+.search-dialog,
+.algolia-dialog,
+#local-search {
+  background: var(--karia-bg-card) !important;
+  border: 1px solid var(--karia-border) !important;
+}
+#archive .article-sort-item-title:hover,
+.article-sort-item-title:hover {
+  color: var(--karia-accent-bri) !important;
+}
+.article-sort-item-title {
+  color: var(--karia-text) !important;
+}
+.article-sort-item-time {
+  color: var(--karia-text-sub) !important;
+}
+
+/* 移动端菜单 */
+#nav-music .aplayer,
+#toggle-menu a.site-page {
+  color: var(--karia-text) !important;
+}
