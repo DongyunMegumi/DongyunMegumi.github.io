@@ -20,43 +20,57 @@
   audio.loop = true;
   audio.volume = 0.65;
 
-  /* ---------- 数据加载 ---------- */
-  async function loadCharacters() {
-    // 1) IndexedDB（与管理页共享）
-    try {
-      if (window.localforage) {
-        const data = await localforage.getItem('cs_characters');
-        if (Array.isArray(data) && data.length) return data;
-      }
-    } catch (e) { /* ignore */ }
+  /* ---------- 异步兜底：任何一步卡住都不阻塞渲染 ---------- */
+  function withTimeout(promise, ms, fallback) {
+    return Promise.race([
+      Promise.resolve(promise).catch(() => fallback),
+      new Promise(res => setTimeout(() => res(fallback), ms))
+    ]);
+  }
 
-    // 2) localStorage 回退
+  /* ---------- 数据源 ---------- */
+  // A) 已发布数据（characters-data.js，同步可读，零依赖）
+  function publishedData() {
     try {
-      const raw = localStorage.getItem('cs_characters');
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (Array.isArray(data) && data.length) return data;
-      }
-    } catch (e) { /* ignore */ }
+      const p = window.__PUBLISHED_DATA__;
+      if (!p) return null;
+      const arr = Array.isArray(p) ? p : p.characters;
+      if (!Array.isArray(arr) || !arr.length) return null;
+      return { characters: arr, savedAt: p.savedAt || 0 };
+    } catch (e) { return null; }
+  }
 
-    // 3) 已发布 JSON（博客部署场景；file:// 下会被 CORS 拦截）
+  // B) 已发布 JSON（线上更实时）
+  async function fetchPublished() {
     try {
-      const res = await fetch('characters-data.json', { cache: 'no-store' });
-      if (res.ok) {
-        const raw = await res.json();
-        const data = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.characters) ? raw.characters : []);
-        if (data.length) return data;
-      }
-    } catch (e) { /* ignore */ }
+      const res = await withTimeout(fetch('characters-data.json', { cache: 'no-store' }), 4000, null);
+      if (!res || !res.ok) return null;
+      const raw = await res.json();
+      const arr = Array.isArray(raw) ? raw : raw.characters;
+      if (!Array.isArray(arr) || !arr.length) return null;
+      return { characters: arr, savedAt: raw.savedAt || 0 };
+    } catch (e) { return null; }
+  }
 
-    // 4) characters-data.js 兜底（<script> 注入，file:// 本地打开也能读到）
+  // C) 本地编辑数据（IndexedDB，可能不可用/被隐私策略拦截）
+  async function localData() {
     try {
-      const payload = window.__PUBLISHED_DATA__;
-      const data = Array.isArray(payload) ? payload : (payload && Array.isArray(payload.characters) ? payload.characters : []);
-      if (data.length) return data;
-    } catch (e) { /* ignore */ }
+      if (!window.localforage) return null;
+      const [list, ts] = await Promise.all([
+        withTimeout(localforage.getItem('cs_characters'), 2500, null),
+        withTimeout(localforage.getItem('cs_savedAt'), 1500, 0)
+      ]);
+      if (!Array.isArray(list) || !list.length) return null;
+      return { characters: list, savedAt: ts || 0 };
+    } catch (e) { return null; }
+  }
 
-    return [];
+  async function persist(data, ts) {
+    try {
+      if (!window.localforage) return;
+      await withTimeout(localforage.setItem('cs_characters', data), 2000, null);
+      await withTimeout(localforage.setItem('cs_savedAt', ts || Date.now()), 1500, null);
+    } catch (e) { /* ignore */ }
   }
 
   /* ---------- 工具 ---------- */
@@ -229,24 +243,21 @@
     }
   }
 
-  /* ---------- 已发布数据仲裁（savedAt 较新者胜出） ---------- */
-  async function loadPublishedData() {
-    let data = null;
-    try {
-      const res = await fetch('characters-data.json', { cache: 'no-store' });
-      if (res.ok) data = await res.json();
-    } catch (e) { /* file:// 下 fetch 被拦截，走 js 兜底 */ }
-    if (!data) data = window.__PUBLISHED_DATA__ || null;
-    if (!data || !Array.isArray(data.characters) || !data.characters.length) return;
-    let localSavedAt = 0;
-    try { localSavedAt = (await localforage.getItem('cs_savedAt')) || 0; } catch (e) { /* ignore */ }
-    if ((data.savedAt || 0) > localSavedAt) {
-      characters = data.characters;
-      try {
-        await localforage.setItem('cs_characters', characters);
-        await localforage.setItem('cs_savedAt', data.savedAt || Date.now());
-      } catch (e) { /* ignore */ }
-    }
+  /* ---------- 已发布数据仲裁：savedAt 较新者胜出 ---------- */
+  async function resolveBestData() {
+    const candidates = [];
+    const pub = publishedData();
+    if (pub) candidates.push(pub);
+    const loc = await localData();
+    if (loc) candidates.push(loc);
+    const fresh = await fetchPublished();
+    if (fresh) candidates.push(fresh);
+
+    if (!candidates.length) return null;
+    candidates.sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
+    const best = candidates[0];
+    if (best !== loc) persist(best.characters, best.savedAt); // 把较新数据写回本地
+    return best.characters;
   }
 
   /* ---------- 发布导出 ---------- */
@@ -347,27 +358,44 @@
   }
 
   /* ---------- 初始化 ---------- */
-  async function init() {
-    spawnParticles();
+  let booted = false;
 
-    characters = await loadCharacters();
-    await loadPublishedData(); // 已发布数据较新时覆盖本地
-
-    if (!characters.length) {
-      $('mmEmpty').hidden = false;
-      return;
-    }
-
-    activeId = characters[0].id;
-    showArtwork(characters[0].mainImg);
-    renderInfo(characters[0]);
+  function boot(list) {
+    characters = list;
+    activeId = list[0].id;
+    showArtwork(list[0].mainImg);
+    renderInfo(list[0]);
     renderSelector();
+    if (booted) return;
+    booted = true;
     bindBgmUpload();
     bindExportButton();
     bindSelectorNav();
     bindKeyboard();
-
     $('soundToggle').addEventListener('click', () => setSound(!soundOn));
+  }
+
+  async function init() {
+    spawnParticles();
+
+    // 1) 同步首屏：直接用已发布数据渲染，绝不等待任何异步（杜绝空白页）
+    const pub = publishedData();
+    if (pub) {
+      try { boot(pub.characters); } catch (e) { console.error(e); }
+    }
+
+    // 2) 异步裁决：取 savedAt 最新的数据，必要时替换首屏
+    try {
+      const best = await resolveBestData();
+      if (best && best.length) {
+        if (!booted || best !== characters) boot(best);
+      } else if (!booted) {
+        $('mmEmpty').hidden = false;
+      }
+    } catch (e) {
+      console.error(e);
+      if (!booted) $('mmEmpty').hidden = false;
+    }
   }
 
   if (document.readyState === 'loading') {
