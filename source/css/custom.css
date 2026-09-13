@@ -71,6 +71,20 @@ body {
 }
 
 /* ============================================================
+   首页角色入口 —— Characters 横向展示墙
+   ============================================================ */
+.home-character-gateway { margin: 0; }
+body.has-character-gateway #page-header.full_page { height: 240px; min-height: 0; }
+body.has-character-gateway #page-header #site-info { top: 100px; }
+body.has-character-gateway #scroll-down { display: none; }
+body.has-character-gateway #page-header .site-title { font-size: 32px; }
+.home-character-gateway, .home-character-gateway * { letter-spacing: 0; }
+@media (max-width: 767px) {
+  body.has-character-gateway #page-header.full_page { height: 220px; }
+  body.has-character-gateway #page-header .site-title { font-size: 26px; }
+}
+
+/* ============================================================
    导航栏 —— 半透明纸片 + 虚线压边
    ============================================================ */
 #nav {

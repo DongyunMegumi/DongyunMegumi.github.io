@@ -1065,8 +1065,13 @@ inject:
     - <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     - <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     - <link rel="stylesheet" href="/css/custom.css">
+    - <link rel="stylesheet" href="/characters/character-cards.css">
+    - <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&display=swap">
     - <script>document.documentElement.setAttribute('data-theme','light');try{localStorage.setItem('theme','light')}catch(e){}</script>
   bottom:
+    - <script src="/characters/assets/vendor/lucide.min.js" defer></script>
+    - <script src="/characters/character-cards.js" defer></script>
+    - <script src="/js/character-home-entry.js" defer></script>
 
 # CDN Settings
 # Don't modify the following settings unless you know how they work

@@ -4,295 +4,102 @@ layout: false
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CHARACTER SHOWCASE | 東雲Megumi</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <script src="assets/vendor/localforage.min.js"></script>
-  <link rel="stylesheet" href="assets/vendor/cropper.min.css" />
-  <script src="assets/vendor/cropper.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="東雲Megumi 的角色作品集，角色立绘、模型渲染与制作记录。">
+  <title>Characters | 東雲Megumi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Shippori+Mincho+B1&family=Zen+Kaku+Gothic+Antique:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="showcase.css">
+  <link rel="stylesheet" href="character-cards.css">
+  <script src="assets/vendor/lucide.min.js" defer></script>
+  <script src="character-cards.js" defer></script>
+  <script src="showcase.js" defer></script>
 </head>
 <body>
-
-  <!-- ===== Header ===== -->
-  <header class="site-header" id="siteHeader">
-    <div class="header-inner">
-      <a href="#hero" class="site-logo">
-        <span class="logo-en">MEGUMI</span>
-        <span class="logo-jp">東雲</span>
-      </a>
-      <nav class="site-nav">
-        <a href="#hero"        class="nav-item active" data-section="hero">TOP</a>
-        <a href="#characters"  class="nav-item" data-section="characters">CHARACTER</a>
-        <a href="#about"       class="nav-item" data-section="about">ABOUT</a>
-        <a href="#contact"     class="nav-item" data-section="contact">CONTACT</a>
-        <a href="/"            class="nav-item nav-item--blog">BLOG</a>
-      </nav>
-    </div>
-    <div class="header-line"></div>
+  <a class="skip-link" href="#overviewTitle">跳转到角色总览</a>
+  <header class="site-tools">
+    <button class="menu-button" id="openMenu" aria-label="Open menu" title="菜单" aria-haspopup="dialog"><i data-lucide="menu"></i></button>
+    <a class="blog-link" href="/">東雲 Megumi</a>
   </header>
-
-  <!-- ===== Hero ===== -->
-  <section class="hero" id="hero">
-    <!-- 背景层 -->
-    <div class="hero-bg-wrap">
-      <div class="hero-bg-color"></div>
-      <div class="hero-bg-img" id="heroBgImg"></div>
-      <div class="hero-bg-noise"></div>
-      <div class="hero-vignette"></div>
-    </div>
-
-    <!-- Canvas 粒子 -->
-    <canvas class="hero-particles" id="heroParticles"></canvas>
-
-    <!-- 装饰几何线 -->
-    <div class="hero-deco-lines">
-      <div class="deco-line deco-line--h1"></div>
-      <div class="deco-line deco-line--h2"></div>
-      <div class="deco-line deco-line--v1"></div>
-      <div class="deco-corner deco-corner--tl"></div>
-      <div class="deco-corner deco-corner--br"></div>
-    </div>
-
-    <!-- 主文字 -->
-    <div class="hero-content">
-      <div class="hero-label">3D CHARACTER ARTIST</div>
-      <h1 class="hero-title">
-        <span class="hero-title-en">CHARACTER</span>
-        <span class="hero-title-jp">作品集</span>
-      </h1>
-      <div class="hero-subtitle-row">
-        <span class="hero-dash"></span>
-        <p class="hero-subtitle">3Dモデル・レンダリング・ワイヤーフレーム</p>
-        <span class="hero-dash"></span>
+  <main>
+    <section class="character-overview" aria-labelledby="overviewTitle">
+      <div class="overview-orbit" aria-hidden="true"></div>
+      <div class="overview-lines" aria-hidden="true"></div>
+      <div class="overview-header">
+        <h1 id="overviewTitle">Characters</h1>
+        <p>Portfolio</p>
       </div>
-      <div class="hero-name">東雲 Megumi</div>
-    </div>
-
-    <!-- 更换背景按钮（隐藏，悬停右下角显示） -->
-    <label class="hero-edit-btn" title="更换主视觉背景">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-      <input type="file" accept="image/*" id="heroBgInput" />
-    </label>
-
-    <!-- 向下滚动提示 -->
-    <div class="hero-scroll-hint">
-      <span>SCROLL</span>
-      <div class="scroll-arrow"></div>
-    </div>
-  </section>
-
-  <!-- ===== Characters ===== -->
-  <section class="characters" id="characters">
-    <div class="char-section-bg"></div>
-
-    <!-- Section 标题 -->
-    <div class="section-header">
-      <div class="section-header-inner">
-        <span class="section-en-label">CHARACTER</span>
-        <div class="section-title-row">
-          <div class="section-deco-line"></div>
-          <h2 class="section-title-jp">キャラクター</h2>
-          <div class="section-deco-line"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Yumia 风格倾斜卡片选择栏 -->
-    <div class="char-card-bar-wrap">
-      <div class="char-card-bar" id="charAvatarBar"></div>
-    </div>
-
-    <!-- 角色详情面板（左图右信息 / karia + HBR 融合布局） -->
-    <div class="char-detail-panel" id="charDetailPanel"></div>
-
-    <!-- 添加新角色 -->
-    <div class="add-char-wrap">
-      <button class="add-char-btn" id="addCharBtn">
-        <span class="add-char-icon">+</span>
-        <span>添加角色</span>
-      </button>
-      <button class="add-char-btn add-char-btn--export" id="exportDataBtn" title="导出当前角色数据为 characters-data.json，上传到 GitHub 即可发布给所有访客">
-        <span class="add-char-icon">&#x2B73;</span>
-        <span>导出并发布</span>
-      </button>
-    </div>
-  </section>
-
-  <!-- ===== About ===== -->
-  <section class="about" id="about">
-    <div class="about-bg"></div>
-    <div class="about-inner">
-
-      <div class="section-header">
-        <div class="section-header-inner">
-          <span class="section-en-label">ABOUT</span>
-          <div class="section-title-row">
-            <div class="section-deco-line"></div>
-            <h2 class="section-title-jp">プロフィール</h2>
-            <div class="section-deco-line"></div>
+      <nav id="overviewCharacters" class="overview-characters portrait-rail" aria-label="角色总览"></nav>
+    </section>
+    <section class="character-stage" id="profile" aria-label="Character showcase" tabindex="-1">
+      <img class="circle-decoration" src="assets/reference/circle_01.png" alt="">
+      <div class="composition">
+        <img class="diamond-background" src="assets/reference/chara_bg.png" alt="">
+        <div class="artwork" id="artwork"><img id="mainArtwork" src="assets/images/char-01.png" alt="キャラクター01" fetchpriority="high"></div>
+        <article class="profile" aria-labelledby="characterName">
+          <div class="profile-top">
+            <p class="character-quote" id="characterQuote"></p>
+            <h2 class="character-name" id="characterName">CHARACTER 01</h2>
+            <p class="character-ruby" id="characterRuby">キャラクター01</p>
           </div>
-        </div>
-      </div>
-
-      <div class="about-grid">
-        <!-- 头像 -->
-        <div class="about-avatar-col">
-          <div class="about-avatar-frame">
-            <div class="about-avatar-inner" id="aboutAvatar">
-              <img src="" alt="東雲Megumi" class="about-avatar-img" id="avatarImg" style="display:none;" />
-              <div class="about-avatar-placeholder" id="avatarPlaceholder">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <span>上传头像</span>
+          <p class="credit-band" id="characterCredit">東雲 Megumi</p>
+          <div class="profile-body">
+            <p class="description" id="characterDescription"></p>
+            <p class="design-note" id="characterStory"></p>
+            <div class="media" id="media">
+              <div class="media-tabs" id="mediaTabs" role="tablist" aria-label="作品类型"></div>
+              <div id="mediaPanel" role="tabpanel">
+                <button class="media-image" id="openMedia" aria-label="Enlarge gallery image" title="放大图片">
+                  <img id="mediaImage" src="assets/images/char-01.png" alt="角色作品">
+                  <span class="media-enlarge"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="media-pagination" id="mediaPagination" aria-label="作品图片"></div>
               </div>
-              <input type="file" accept="image/*" class="about-avatar-input" id="avatarInput" />
-              <label class="about-avatar-change" id="avatarChangeLabel" style="display:none;">更换头像</label>
             </div>
-            <!-- 装饰边框 -->
-            <div class="avatar-deco-tl"></div>
-            <div class="avatar-deco-br"></div>
+            <details class="technical" id="technical">
+              <summary>Model details <i data-lucide="plus"></i></summary>
+              <dl id="technicalData"></dl><p class="tags" id="characterTags"></p>
+            </details>
           </div>
-        </div>
-
-        <!-- 信息 -->
-        <div class="about-info-col">
-          <div class="about-name-block">
-            <h3 class="about-name-jp" contenteditable="true">東雲Megumi</h3>
-            <p class="about-name-en" contenteditable="true">@DongyunMegumi</p>
-          </div>
-          <p class="about-tagline" contenteditable="true">3D Commission open✨</p>
-          <div class="about-bio">
-            <p contenteditable="true">忘れられないように、うまくなりたい</p>
-            <p contenteditable="true">主にCG、ペイント、ゲーム。最近はBlenderやUnity、3Dアシストドローイングなどを学ぶ。</p>
-            <p contenteditable="true">DM me もし問題があったっら / 中文 日语 English</p>
-          </div>
-
-          <!-- 技能标签 -->
-          <div class="about-skills">
-            <div class="skill-tag" contenteditable="true">Blender</div>
-            <div class="skill-tag" contenteditable="true">ZBrush</div>
-            <div class="skill-tag" contenteditable="true">Substance Painter</div>
-            <div class="skill-tag" contenteditable="true">Maya</div>
-            <div class="skill-tag" contenteditable="true">Marvelous Designer</div>
-            <div class="skill-tag" contenteditable="true">Unity / UE5</div>
-          </div>
-
-          <!-- 社交链接 -->
-          <div class="about-socials">
-            <a href="https://x.com/DongyunMegumi" target="_blank" class="social-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.26 5.632 5.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              <span>Twitter / X</span>
-            </a>
-            <a href="https://vgen.co/DongyunMegumi" target="_blank" class="social-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
-              <span>VGen</span>
-            </a>
-            <a href="https://space.bilibili.com/425568077" target="_blank" class="social-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906L17.813 4.653zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773H5.333zm8 4.187c.373.373.56.826.56 1.36s-.187.986-.56 1.36c-.373.373-.826.56-1.36.56s-.986-.187-1.36-.56c-.373-.373-.56-.826-.56-1.36s.187-.987.56-1.36c.373-.373.826-.56 1.36-.56s.987.187 1.36.56zm-4.8 0c.373.373.56.826.56 1.36s-.187.986-.56 1.36c-.373.373-.827.56-1.36.56-.534 0-.987-.187-1.36-.56-.374-.373-.56-.826-.56-1.36s.186-.987.56-1.36c.373-.373.826-.56 1.36-.56s.987.187 1.36.56z"/></svg>
-              <span>Bilibili</span>
-            </a>
-          </div>
-        </div>
+          <img class="profile-decoration" src="assets/reference/chara_base-text-deco.png" alt="">
+        </article>
       </div>
-    </div>
-  </section>
-
-  <!-- ===== Contact ===== -->
-  <section class="contact" id="contact">
-    <div class="contact-inner">
-      <div class="section-header">
-        <div class="section-header-inner">
-          <span class="section-en-label">CONTACT</span>
-          <div class="section-title-row">
-            <div class="section-deco-line"></div>
-            <h2 class="section-title-jp">お問い合わせ</h2>
-            <div class="section-deco-line"></div>
-          </div>
-        </div>
+      <div class="artwork-tools">
+        <button class="round-tool" id="toggleFraming" aria-label="Show full artwork" aria-pressed="false" title="全身 / 特写"><i data-lucide="minimize"></i></button>
+        <button class="round-tool secondary-tool" id="enlargeArtwork" aria-label="Enlarge artwork" title="放大立绘"><i data-lucide="expand"></i></button>
       </div>
-      <div class="contact-links">
-        <a href="https://x.com/DongyunMegumi" target="_blank" class="contact-card">
-          <div class="contact-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.26 5.632 5.905-5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </div>
-          <div class="contact-card-info">
-            <span class="contact-card-label">Twitter / X</span>
-            <span class="contact-card-value">@DongyunMegumi</span>
-          </div>
-        </a>
-        <a href="https://vgen.co/DongyunMegumi" target="_blank" class="contact-card">
-          <div class="contact-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8.56 2.75c4.37 6.03 6.02 9.42 8.03 17.72m2.54-15.38c-3.72 4.35-8.94 5.66-16.88 5.85m19.5 1.9c-3.5-.93-6.63-.82-8.94 0-2.58.92-5.01 2.86-7.44 6.32"/></svg>
-          </div>
-          <div class="contact-card-info">
-            <span class="contact-card-label">Commission</span>
-            <span class="contact-card-value">vgen.co/DongyunMegumi</span>
-          </div>
-        </a>
-        <a href="https://space.bilibili.com/425568077" target="_blank" class="contact-card">
-          <div class="contact-card-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.813 4.653h.854c1.51.054 2.769.578 3.773 1.574 1.004.995 1.524 2.249 1.56 3.76v7.36c-.036 1.51-.556 2.769-1.56 3.773s-2.262 1.524-3.773 1.56H5.333c-1.51-.036-2.769-.556-3.773-1.56S.036 18.858 0 17.347v-7.36c.036-1.511.556-2.765 1.56-3.76 1.004-.996 2.262-1.52 3.773-1.574h.774l-1.174-1.12a1.234 1.234 0 0 1-.373-.906c0-.356.124-.658.373-.907l.027-.027c.267-.249.573-.373.92-.373.347 0 .653.124.92.373L9.653 4.44c.071.071.134.142.187.213h4.267a.836.836 0 0 1 .16-.213l2.853-2.747c.267-.249.573-.373.92-.373.347 0 .662.151.929.4.267.249.391.551.391.907 0 .355-.124.657-.373.906L17.813 4.653zM5.333 7.24c-.746.018-1.373.276-1.88.773-.506.498-.769 1.13-.786 1.894v7.52c.017.764.28 1.395.786 1.893.507.498 1.134.756 1.88.773h13.334c.746-.017 1.373-.275 1.88-.773.506-.498.769-1.129.786-1.893v-7.52c-.017-.765-.28-1.396-.786-1.894-.507-.497-1.134-.755-1.88-.773H5.333zm8 4.187c.373.373.56.826.56 1.36s-.187.986-.56 1.36c-.373.373-.826.56-1.36.56s-.986-.187-1.36-.56c-.373-.373-.56-.826-.56-1.36s.187-.987.56-1.36c.373-.373.826-.56 1.36-.56s.987.187 1.36.56zm-4.8 0c.373.373.56.826.56 1.36s-.187.986-.56 1.36c-.373.373-.827.56-1.36.56-.534 0-.987-.187-1.36-.56-.374-.373-.56-.826-.56-1.36s.186-.987.56-1.36c.373-.373.826-.56 1.36-.56s.987.187 1.36.56z"/></svg>
-          </div>
-          <div class="contact-card-info">
-            <span class="contact-card-label">Bilibili</span>
-            <span class="contact-card-value">space.bilibili.com/425568077</span>
-          </div>
-        </a>
+      <button class="character-arrow previous" id="previousCharacter" aria-label="Previous character" title="上一个角色"><i data-lucide="chevron-left"></i></button>
+      <button class="character-arrow next" id="nextCharacter" aria-label="Next character" title="下一个角色"><i data-lucide="chevron-right"></i></button>
+    </section>
+    <section class="character-selection character-band" aria-labelledby="selectionTitle">
+      <div class="character-band-orbit" aria-hidden="true"></div>
+      <div class="character-band-heading">
+        <h2 id="selectionTitle">Characters</h2>
+        <a href="#overviewTitle">All characters</a>
       </div>
-    </div>
-  </section>
-
-  <!-- ===== Footer ===== -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-logo">
-        <span class="logo-en">MEGUMI</span>
-        <span class="logo-jp">東雲</span>
-      </div>
-      <p class="footer-copy">&copy; 2026 東雲Megumi. All rights reserved.</p>
-    </div>
+      <nav id="characterSelector" class="character-selector portrait-rail" aria-label="选择角色"></nav>
+      <p class="selection-counter" id="selectionCounter" aria-live="polite">01 / 03</p>
+    </section>
+  </main>
+  <footer class="showcase-footer">
+    <a class="artist-signature" href="/">東雲<span>Megumi</span></a>
+    <nav aria-label="站点链接"><a href="/">Blog</a><a href="/about/">About</a><a href="https://vgen.co/DongyunMegumi" target="_blank" rel="noopener">Commission</a><a href="https://x.com/DongyunMegumi" target="_blank" rel="noopener">X / Twitter</a></nav>
+    <small>&copy; 2026 東雲Megumi</small>
   </footer>
-
-  <!-- ===== Lightbox ===== -->
-  <div class="lightbox-overlay" id="lightboxOverlay">
-    <div class="lightbox-box">
-      <button class="lightbox-close" id="lightboxClose">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-      <button class="lightbox-prev" id="lightboxPrev">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <div class="lightbox-img-wrap">
-        <img src="" alt="" id="lightboxImg" class="lightbox-img" />
-      </div>
-      <button class="lightbox-next" id="lightboxNext">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <div class="lightbox-counter" id="lightboxCounter"></div>
-    </div>
-  </div>
-
-  <!-- ===== 裁剪弹窗 ===== -->
-  <div class="crop-overlay" id="cropOverlay">
-    <div class="crop-modal">
-      <div class="crop-header">
-        <span>调整图片范围</span>
-        <button class="crop-close" id="cropClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="crop-body">
-        <img id="cropImage" src="" alt="" style="max-width:100%;display:block;" />
-      </div>
-      <div class="crop-footer">
-        <button class="crop-btn-cancel" id="cropCancel">取消</button>
-        <button class="crop-btn-confirm" id="cropConfirm">确认裁剪</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <dialog class="navigation-dialog" id="navigationDialog" aria-label="菜单">
+    <button class="dialog-close" data-close="navigationDialog" aria-label="Close menu" title="关闭菜单"><i data-lucide="x"></i></button>
+    <p class="menu-brand">東雲 Megumi</p>
+    <nav><a href="/">Blog</a><a href="#overviewTitle">Characters</a><a href="/about/">About</a><a href="https://vgen.co/DongyunMegumi" target="_blank" rel="noopener">Commission</a></nav>
+  </dialog>
+  <dialog class="image-dialog" id="imageDialog" aria-label="图片预览">
+    <button class="dialog-close" data-close="imageDialog" aria-label="Close image" title="关闭图片"><i data-lucide="x"></i></button>
+    <button class="image-previous" id="imagePrevious" aria-label="Previous image" title="上一张"><i data-lucide="chevron-left"></i></button>
+    <img id="dialogImage" alt="">
+    <button class="image-next" id="imageNext" aria-label="Next image" title="下一张"><i data-lucide="chevron-right"></i></button>
+    <p id="imageCounter"></p>
+  </dialog>
+  <p class="load-status" id="loadStatus" role="status" hidden></p>
 </body>
 </html>

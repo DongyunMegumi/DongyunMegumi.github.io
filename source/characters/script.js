@@ -155,6 +155,7 @@
   async function saveData() {
     try {
       await localforage.setItem('cs_characters', characters);
+      await localforage.setItem('cs_savedAt', Date.now());
       showToast('已保存', 'success');
     } catch (e) {
       try {

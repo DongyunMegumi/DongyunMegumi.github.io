@@ -20,7 +20,7 @@
         "tool": "Blender / ZBrush",
         "style": "二次元 / 卡通"
       },
-      "mainImg": "assets/images/char-01.png"
+      "mainImg": "assets/images/display/char-01-cutout.png"
     },
     {
       "id": 1,
@@ -41,7 +41,7 @@
         "tool": "Maya / ZBrush",
         "style": "写实 / 影视级"
       },
-      "mainImg": "assets/images/char-02.jpg"
+      "mainImg": "assets/images/display/char-02-cutout.png"
     },
     {
       "id": 2,
