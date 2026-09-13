@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="ja" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき | Dongyun Megumi</title><meta name="author" content="Dongyun Megumi"><meta name="copyright" content="Dongyun Megumi"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f4efe6"><meta name="description" content="Blender 4.5 LTS を使っていて、特定の操作でクラッシュする問題に悩まされていました。原因を特定できたので、同じ問題に遭遇した人のためにメモを残します。 症状MACHIN3tools の特定のオペレーター実行後、Undo（Ctrl+Z）時に Blender がクラッシュする。 原因bm.clear() を呼び出した場合、ジオメトリデータはクリアされるが BMesh オブジェクト自体は解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき">
+<meta property="og:url" content="https://dongyunmegumi.github.io/2026/08/blender-bmesh-free/index.html">
+<meta property="og:site_name" content="Dongyun Megumi">
+<meta property="og:description" content="Blender 4.5 LTS を使っていて、特定の操作でクラッシュする問題に悩まされていました。原因を特定できたので、同じ問題に遭遇した人のためにメモを残します。 症状MACHIN3tools の特定のオペレーター実行後、Undo（Ctrl+Z）時に Blender がクラッシュする。 原因bm.clear() を呼び出した場合、ジオメトリデータはクリアされるが BMesh オブジェクト自体は解">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://dongyunmegumi.github.io/img/cover-alt.png">
+<meta property="article:published_time" content="2026-08-30T10:00:00.000Z">
+<meta property="article:modified_time" content="2026-09-13T01:27:19.516Z">
+<meta property="article:author" content="Dongyun Megumi">
+<meta property="article:tag" content="Blender">
+<meta property="article:tag" content="Tips">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dongyunmegumi.github.io/img/cover-alt.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき",
+  "url": "https://dongyunmegumi.github.io/2026/08/blender-bmesh-free/",
+  "image": "https://dongyunmegumi.github.io/img/cover-alt.png",
+  "datePublished": "2026-08-30T10:00:00.000Z",
+  "dateModified": "2026-09-13T01:27:19.516Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Dongyun Megumi",
+      "url": "https://dongyunmegumi.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dongyunmegumi.github.io/2026/08/blender-bmesh-free/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f4efe6')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f4efe6')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&amp;family=Zen+Maru+Gothic:wght@400;500;700&amp;family=Patrick+Hand&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'コピー成功',
+    error: 'コピー失敗',
+    noSupport: 'ブラウザが対応していません'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'たった今',
+    min: '分前',
+    hour: '時間前',
+    day: '日前',
+    month: 'ヶ月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'もっと見る'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Patrick+Hand&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="/characters/character-cards.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&display=swap"><script>document.documentElement.setAttribute('data-theme','light');try{localStorage.setItem('theme','light')}catch(e){}</script><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #f4efe6;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">記事</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">タグ</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">カテゴリ</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> ホーム</span></a></div><div class="menus_item"><a class="site-page" href="/characters/"><i class="fa-fw fas fa-dragon"></i><span> キャラ</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> アーカイブ</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> タグ</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Dongyun Megumi</span></a><a class="nav-page-title" href="/"><span class="site-name">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  ホームに戻る</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> ホーム</span></a></div><div class="menus_item"><a class="site-page" href="/characters/"><i class="fa-fw fas fa-dragon"></i><span> キャラ</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> アーカイブ</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> タグ</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">作成日</span><time class="post-meta-date-created" datetime="2026-08-30T10:00:00.000Z" title="作成日 2026-08-30 18:00:00">2026-08-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新日</span><time class="post-meta-date-updated" datetime="2026-09-13T01:27:19.516Z" title="更新日 2026-09-13 09:27:19">2026-09-13</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E8%A1%93%E3%83%A1%E3%83%A2/">技術メモ</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">閲覧数:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>Blender 4.5 LTS を使っていて、特定の操作でクラッシュする問題に悩まされていました。<br>原因を特定できたので、同じ問題に遭遇した人のためにメモを残します。</p>
+<h2 id="症状"><a href="#症状" class="headerlink" title="症状"></a>症状</h2><p>MACHIN3tools の特定のオペレーター実行後、<strong>Undo（Ctrl+Z）時に Blender がクラッシュ</strong>する。</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p><code>bm.clear()</code> を呼び出した場合、<strong>ジオメトリデータはクリアされるが BMesh オブジェクト自体は解放されない</strong>。<br>残った BMesh は Python のガベージコレクションに回収を任されるのですが、このとき <strong>C 側のポインタはすでに無効</strong>になっているため、GC が走った瞬間にダングリングポインタアクセスでクラッシュします。</p>
+<h2 id="解決策"><a href="#解決策" class="headerlink" title="解決策"></a>解決策</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ❌ 悪い例 — クラッシュの原因</span></span><br><span class="line">bm.clear()</span><br><span class="line"></span><br><span class="line"><span class="comment"># ✅ 良い例 — メモリを確実に解放</span></span><br><span class="line">bm.free()</span><br></pre></td></tr></table></figure>
+
+<p><code>bm.clear()</code> はジオメトリだけ消して BMesh を保持したい場合に使うもの。<br><strong>使い終わった BMesh は必ず <code>bm.free()</code> で解放</strong>しましょう。</p>
+<h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>動作</th>
+<th>使いどころ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>bm.clear()</code></td>
+<td>ジオメトリ削除、BMesh は存続</td>
+<td>BMesh を再利用する場合</td>
+</tr>
+<tr>
+<td><code>bm.free()</code></td>
+<td>BMesh 自体を解放</td>
+<td>使い終わったら必ず呼ぶ</td>
+</tr>
+</tbody></table>
+<p>この修正で MACHIN3tools の <code>utils/mesh.py</code> と <code>ui/operators/shade.py</code> を直して以来、クラッシュは一度も起きていません。</p>
+<hr>
+<p><em>中文说明：Blender 4.5 LTS 中，<code>bm.clear()</code> 只清空几何数据但不释放 BMesh 对象，残留对象被 Python GC 回收时会触发悬空指针导致崩溃。改用 <code>bm.free()</code> 即可根治。</em></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>著者: </span><span class="post-copyright-info"><a href="https://dongyunmegumi.github.io">Dongyun Megumi</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>リンク: </span><span class="post-copyright-info"><a href="https://dongyunmegumi.github.io/2026/08/blender-bmesh-free/">https://dongyunmegumi.github.io/2026/08/blender-bmesh-free/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>著作権表示: </span><span class="post-copyright-info">このブログのすべての記事は、<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> ライセンスの下で提供されており、特に明記されていない限り、すべての権利を留保します。転載時には出典を明記してください: <a href="https://dongyunmegumi.github.io">Dongyun Megumi</a>。</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Blender/">Blender</a><a class="post-meta__tags" href="/tags/Tips/">Tips</a></div><div class="post-share"><div class="social-share" data-image="/img/cover-alt.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました"><img class="cover" src="/img/cover-default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">次へ</div><div class="info-item-2">はじめまして — 作品集ブログ始めました</div></div><div class="info-2"><div class="info-item-1">はじめまして、Dongyun Megumi です。 このブログは私の 3D創作作品集 として始めました。忘れられないように、うまくなりたい——いつか振り返ったときに、自分の成長の軌跡が残る場所にしたいです。 このブログで書くこと キャラクター制作の記録 — スカルプトからトポロジー、リギングまで WIP（Work in Progress） — 制作途中の絵や失敗の記録も含めて Blender &#x2F; Unity の学び — ハマった罠とその解決法 3Dアシストドローイング — 3D を下書きに使ったイラスト制作  使用ツール   用途 ツール    モデリング・スカルプト Blender &#x2F; ZBrush   テクスチャ Substance Painter   ゲームエンジン Unity   ペイント Clip Studio Paint   これからまずは現在進行中のキャラクタープロジェクトの制作過程から順番に投稿していく予定です。 よろしくお願いします。  大家好，我是 Dongyun Megumi。这个博客是我的 3D 创作作品集——用来记录角色制作的过程、W...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>関連記事</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました"><img class="cover" src="/img/cover-default.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-30</div><div class="info-item-2">はじめまして — 作品集ブログ始めました</div></div><div class="info-2"><div class="info-item-1">はじめまして、Dongyun Megumi です。 このブログは私の 3D創作作品集 として始めました。忘れられないように、うまくなりたい——いつか振り返ったときに、自分の成長の軌跡が残る場所にしたいです。 このブログで書くこと キャラクター制作の記録 — スカルプトからトポロジー、リギングまで WIP（Work in Progress） — 制作途中の絵や失敗の記録も含めて Blender &#x2F; Unity の学び — ハマった罠とその解決法 3Dアシストドローイング — 3D を下書きに使ったイラスト制作  使用ツール   用途 ツール    モデリング・スカルプト Blender &#x2F; ZBrush   テクスチャ Substance Painter   ゲームエンジン Unity   ペイント Clip Studio Paint   これからまずは現在進行中のキャラクタープロジェクトの制作過程から順番に投稿していく予定です。 よろしくお願いします。  大家好，我是 Dongyun Megumi。这个博客是我的 3D 创作作品集——用来记录角色制作的过程、W...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Dongyun Megumi</div><div class="author-info-description">忘れられないように、うまくなりたい。主にCG、ペイント、ゲーム。最近はBlenderやUnity、3Dアシストドローイングなどを学ぶ。</div><div class="site-data"><a href="/archives/"><div class="headline">記事</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">タグ</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">カテゴリ</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://x.com/DongyunMegumi" target="_blank" title="X / Twitter"><i class="fab fa-x-twitter" style="color: #a992f0;"></i></a><a class="social-icon" href="https://github.com/DongyunMegumi" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #f0ecff;"></i></a><a class="social-icon" href="https://vgen.co/DongyunMegumi" target="_blank" title="VGen"><i class="fas fa-palette" style="color: #8b75d7;"></i></a><a class="social-icon" href="https://space.bilibili.com/425568077" target="_blank" title="Bilibili"><i class="fas fa-play-circle" style="color: #a992f0;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>お知らせ</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目次</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%97%87%E7%8A%B6"><span class="toc-number">1.</span> <span class="toc-text">症状</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%9B%A0"><span class="toc-number">2.</span> <span class="toc-text">原因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%B1%BA%E7%AD%96"><span class="toc-number">3.</span> <span class="toc-text">解決策</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E3%81%BE%E3%81%A8%E3%82%81"><span class="toc-number">4.</span> <span class="toc-text">まとめ</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最近の記事</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"><img src="/img/cover-alt.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"/></a><div class="content"><a class="title" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</a><time datetime="2026-08-30T10:00:00.000Z" title="作成日 2026-08-30 18:00:00">2026-08-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました"><img src="/img/cover-default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="はじめまして — 作品集ブログ始めました"/></a><div class="content"><a class="title" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました">はじめまして — 作品集ブログ始めました</a><time datetime="2026-08-30T09:30:00.000Z" title="作成日 2026-08-30 17:30:00">2026-08-30</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Dongyun Megumi</span></div><div class="footer_custom_text">忘れられないように、うまくなりたい ✿ Mochimochi.</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="読書モード"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="ライトモード/ダークモード切り替え"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="シングルカラムとダブルカラムの切り替え"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目次"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="トップに戻る"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/characters/assets/vendor/lucide.min.js" defer></script><script src="/characters/character-cards.js" defer></script><script src="/js/character-home-entry.js" defer></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
