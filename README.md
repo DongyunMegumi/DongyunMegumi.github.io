@@ -2,7 +2,7 @@
 
 - **线上地址**：<https://dongyunmegumi.github.io/>
 - **仓库**：<https://github.com/DongyunMegumi/DongyunMegumi.github.io>
-- **主题**：Butterfly 5.7 + 深空紫定制（与 character-showcase-v2 视觉一致）
+- **页面**：新版作品集首页与子页面；博客文章保留 Butterfly 5.7
 
 ## 分支结构
 
@@ -15,10 +15,20 @@
 
 1. 在 `source/_posts/` 下新建 `.md` 文件（或用 `npx hexo new "标题"`）
 2. 本地预览：`npx hexo server` → 打开 <http://localhost:4000>
-3. 发布：`npx hexo clean && npx hexo generate && npx hexo deploy`
-4. 备份源码：`git add -A && git commit -m "new post" && git push origin source`
+3. 完整构建：`npm run clean && npm run build`（首次需安装根目录及 `preview/portfolio-case/` 的依赖）
+4. 提交并推送到 `source`，GitHub Actions 会自动构建博客和新版作品集并更新 `main`
 
 等 1~2 分钟 GitHub Pages 重新构建完成，线上就更新了。
+
+## 作品集发布
+
+页面源码在 `preview/portfolio-case/`，发布入口为 `tools/build-portfolio.cjs`。
+首页、模型总览、Sumi 展示、委托、News、About 和 Archive 都会生成独立静态页面。
+原有博客文章、归档和角色详情保留。
+
+`portfolio-assets/` 只存经批准的公开展示素材，包括精简后的 Sumi GLB。
+浏览器展示模型的文件可被访客获取；此目录不提供防下载保护。
+原始 VRM、Blender 工程、`.local.json` 和 `.local-assets/` 不发布。
 
 ## 文章头格式
 

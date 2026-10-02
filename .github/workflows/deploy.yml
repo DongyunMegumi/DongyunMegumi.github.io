@@ -24,12 +24,14 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm ci
+          npm ci --prefix preview/portfolio-case
 
-      - name: Build Hexo
+      - name: Build blog and portfolio
         run: |
           npx hexo clean
-          npx hexo generate
+          npm run build
 
       - name: Deploy to main branch
         uses: peaceiris/actions-gh-pages@v4

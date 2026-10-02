@@ -334,7 +334,7 @@ async function loadModel() {
     }
     const loader = new GLTFLoader();
     loader.register(parser => new VRMLoaderPlugin(parser));
-    const gltf = await loader.loadAsync('/asset/model.vrm', progress => {
+    const gltf = await loader.loadAsync(document.body.dataset.modelUrl || '/asset/model.vrm', progress => {
       if (progress.total) {
         const value = Math.round(progress.loaded / progress.total * 100);
         $('loadProgress').value = value;
@@ -342,16 +342,18 @@ async function loadModel() {
       }
     });
     vrm = gltf.userData.vrm;
-    if (!vrm) throw new Error('Unsupported VRM');
-    VRMUtils.rotateVRM0(vrm);
-    scene.add(vrm.scene);
-    vrm.humanoid.setNormalizedPose({
-      leftUpperArm: { rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), 1.02).toArray() },
-      rightUpperArm: { rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), -1.02).toArray() }
-    });
-    vrm.humanoid.update();
-    vrm.scene.updateMatrixWorld(true);
-    vrm.scene.traverse(mesh => {
+    const modelScene = vrm?.scene || gltf.scene;
+    if (vrm) {
+      VRMUtils.rotateVRM0(vrm);
+      vrm.humanoid.setNormalizedPose({
+        leftUpperArm: { rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), 1.02).toArray() },
+        rightUpperArm: { rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), -1.02).toArray() }
+      });
+      vrm.humanoid.update();
+    }
+    scene.add(modelScene);
+    modelScene.updateMatrixWorld(true);
+    modelScene.traverse(mesh => {
       if (!mesh.isMesh) return;
       mesh.frustumCulled = false;
       const original = mesh.material;
@@ -359,10 +361,15 @@ async function loadModel() {
       const variants = materials.map(materialVariants);
       records.push({ mesh, original, base: Array.isArray(original) ? variants.map(x => x.base) : variants[0].base, clay: Array.isArray(original) ? variants.map(x => x.clay) : variants[0].clay });
     });
-    bounds = new THREE.Box3().setFromObject(vrm.scene);
+    bounds = new THREE.Box3().setFromObject(modelScene);
     height = bounds.max.y - bounds.min.y;
     center = bounds.getCenter(new THREE.Vector3());
-    vrm.humanoid.getNormalizedBoneNode('head').getWorldPosition(headPosition);
+    if (vrm) vrm.humanoid.getNormalizedBoneNode('head').getWorldPosition(headPosition);
+    else {
+      const display = modelScene.getObjectByName('SumiDisplay');
+      if (display?.userData.previewHead) headPosition.fromArray(display.userData.previewHead);
+      else headPosition.set(center.x, bounds.min.y + height * .9, center.z);
+    }
     const metadata = gltf.parser.json;
     const triangles = metadata.meshes.reduce((sum, mesh) => sum + mesh.primitives.reduce((n, primitive) => n + (metadata.accessors[primitive.indices]?.count || 0) / 3, 0), 0);
     $('triangleCount').textContent = triangles.toLocaleString('en-US');

@@ -7,7 +7,7 @@ const title = document.getElementById("articleTitle");
 const body = document.getElementById("articleBody");
 try {
   const slug = new URLSearchParams(location.search).get("post");
-  const response = await fetch(`/home/post/${encodeURIComponent(slug || "")}`);
+  const response = await fetch(`/home/post/${encodeURIComponent(slug || "")}.json`);
   if (!response.ok) throw new Error("Article unavailable");
   const article = await response.json();
   title.textContent = article.title;

@@ -55,7 +55,7 @@ const server = http.createServer(async (req, res) => {
     res.end(); return;
   }
   if (url.startsWith('/home/post/')) {
-    const slug = url.slice('/home/post/'.length);
+    const slug = url.slice('/home/post/'.length).replace(/\.json$/, '');
     if (!['hello-portfolio', 'blender-bmesh-free'].includes(slug)) { res.writeHead(404); res.end('Not found'); return; }
     try {
       const frontMatter = require('hexo-front-matter');

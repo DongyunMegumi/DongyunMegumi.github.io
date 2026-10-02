@@ -41,7 +41,7 @@ The server listens only on `127.0.0.1:4002`. Use `PORT` to select another port.
 
 Create an ignored `.local.json` next to `server.cjs` with absolute `model`, `reference`, `motion`, and `matcap` paths. `model` points to a VRM file, `reference` to its character sheet, `motion` to the original animated GIF, and `matcap` to a PNG MatCap. The current reference layout supports a sheet with back, front, and side views from left to right. Restart the server after changing paths.
 
-Model and reference files are read from their original locations, not copied into the repository. Never commit client assets or `.local.json`. This preview lives outside Hexo's `source` directory and is not included in publishing.
+The local server reads model and reference files from their original locations. Never commit `.local.json`, `.local-assets`, or original client project files. Public display assets approved by the owner are kept separately in the repository's `portfolio-assets/` directory. `tools/build-portfolio.cjs` publishes an explicit page/asset allowlist after Hexo generation, without exposing this local server or its settings. The public viewer uses a reduced GLB display export; the local preview still uses the original VRM.
 
 ## Interaction
 
