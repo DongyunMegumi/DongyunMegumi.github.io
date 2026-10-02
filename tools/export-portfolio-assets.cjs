@@ -5,6 +5,7 @@ const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const preview = path.join(root, 'preview/portfolio-case');
 const output = path.join(root, 'portfolio-assets');
+const privateModel = path.join(preview, '.local-assets/sumi-display.glb');
 const base = process.env.PREVIEW_URL || 'http://127.0.0.1:4002';
 const { chromium } = require(require.resolve('playwright', {
   paths: [path.join(process.env.USERPROFILE, '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules')]
@@ -84,9 +85,9 @@ async function main() {
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 10000);
     });
-    await (await downloadPromise).saveAs(path.join(output, 'asset/sumi-display.glb'));
+    await (await downloadPromise).saveAs(privateModel);
   } finally { await browser.close(); }
-  const bytes = await fs.readFile(path.join(output, 'asset/sumi-display.glb'));
+  const bytes = await fs.readFile(privateModel);
   assert.equal(bytes.toString('ascii', 0, 4), 'glTF');
   const json = JSON.parse(bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)));
   assert.ok(!JSON.stringify(json).includes('VRM'), 'VRM metadata must not be exported');
@@ -94,7 +95,8 @@ async function main() {
   assert.ok(json.meshes.every(mesh => mesh.primitives.every(primitive => !primitive.targets)));
   assert.ok(bytes.length < 45 * 1024 * 1024, 'Display asset exceeds publishing budget');
   console.log(`Exported self-contained display GLB: ${(bytes.length / 1024 / 1024).toFixed(2)} MiB`);
-  console.log(`Public display assets: ${output}`);
+  console.log(`Original display GLB remains local: ${privateModel}`);
+  console.log('Run tools/encrypt-model.cjs before publishing.');
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

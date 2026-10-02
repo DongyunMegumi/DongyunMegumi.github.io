@@ -75,7 +75,14 @@ async function main() {
     await page.goto(base + '/models/sumi/', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.casePreview?.state.ready, null, { timeout: 120000 });
     await page.evaluate(() => document.fonts.ready);
-    assert.equal(await page.locator('body').getAttribute('data-model-url'), '/asset/sumi-display.glb');
+    assert.equal(await page.locator('body').getAttribute('data-model-storage'), 'encrypted');
+    const modelAccess = await page.locator('#modelAccess').evaluate(node => JSON.parse(node.textContent));
+    assert.match(modelAccess.url, /^\/asset\/sumi-display\.[a-f0-9]{16}\.enc$/);
+    const cipherResponse = await page.request.get(base + modelAccess.url);
+    assert.equal(cipherResponse.status(), 200);
+    const cipherBytes = await cipherResponse.body();
+    assert.equal(cipherBytes.toString('ascii', 0, 8), 'MEGUMI01');
+    assert.notEqual(cipherBytes.toString('ascii', 0, 4), 'glTF');
     assert.ok(Number((await page.locator('#triangleCount').textContent()).replaceAll(',', '')) > 1000);
     for (const width of [1280, 1864, 1920]) {
       await page.setViewportSize({ width, height: 884 });
@@ -120,7 +127,17 @@ async function main() {
     assert.equal(await page.locator('#motionDialog').evaluate(dialog => dialog.open), true);
     await page.keyboard.press('Escape');
     assert.deepEqual(errors, [], `Browser errors: ${errors.join(', ')}`);
-    for (const forbidden of ['/.local.json', '/server.cjs', '/asset/model.vrm', '/portfolio-assets/README.md']) {
+    const failure = await browser.newPage({ viewport: { width: 1280, height: 884 }, reducedMotion: 'reduce' });
+    await failure.route('**/asset/*.enc', route => route.fulfill({ status: 200, body: 'damaged encrypted asset' }));
+    await failure.goto(base + '/models/sumi/', { waitUntil: 'domcontentloaded' });
+    await failure.locator('#retryModel').waitFor({ state: 'visible' });
+    assert.equal(await failure.locator('#autoRotate').isDisabled(), true);
+    await failure.unroute('**/asset/*.enc');
+    await failure.locator('#retryModel').click();
+    await failure.waitForFunction(() => window.casePreview?.state.ready, null, { timeout: 120000 });
+    assert.equal(await failure.locator('#autoRotate').isDisabled(), false);
+    await failure.close();
+    for (const forbidden of ['/.local.json', '/server.cjs', '/asset/model.vrm', '/asset/sumi-display.glb', '/portfolio-assets/README.md']) {
       assert.equal((await page.request.get(base + forbidden)).status(), 404, `Private file exposed: ${forbidden}`);
     }
     const noJS = await browser.newPage({ javaScriptEnabled: false });

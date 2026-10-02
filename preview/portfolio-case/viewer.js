@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { VRMLoaderPlugin, VRMUtils } from '@pixiv/three-vrm';
 import { setupScrollReveal } from './scroll-reveal.js';
 import { prepareBrand } from '/home/brand.js';
+import { loadEncryptedModel } from './model-crypto.js';
 
 setupScrollReveal();
 prepareBrand();
@@ -334,13 +335,22 @@ async function loadModel() {
     }
     const loader = new GLTFLoader();
     loader.register(parser => new VRMLoaderPlugin(parser));
-    const gltf = await loader.loadAsync(document.body.dataset.modelUrl || '/asset/model.vrm', progress => {
+    const onProgress = progress => {
       if (progress.total) {
         const value = Math.round(progress.loaded / progress.total * 100);
         $('loadProgress').value = value;
         $('loadText').textContent = value >= 100 ? '正在准备材质' : `正在加载模型 ${value}%`;
       }
-    });
+    };
+    let gltf;
+    if (document.body.dataset.modelStorage === 'encrypted') {
+      const config = JSON.parse($('modelAccess').textContent);
+      const bytes = await loadEncryptedModel(config, onProgress);
+      $('loadText').textContent = '正在准备模型';
+      gltf = await loader.parseAsync(bytes, '');
+    } else {
+      gltf = await loader.loadAsync(document.body.dataset.modelUrl || '/asset/model.vrm', onProgress);
+    }
     vrm = gltf.userData.vrm;
     const modelScene = vrm?.scene || gltf.scene;
     if (vrm) {

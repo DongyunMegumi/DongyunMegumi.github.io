@@ -28,6 +28,9 @@ jobs:
           npm ci
           npm ci --prefix preview/portfolio-case
 
+      - name: Test model encryption
+        run: npm run test:model-encryption
+
       - name: Build blog and portfolio
         run: |
           npx hexo clean

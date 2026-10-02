@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.cjs",
-    "check": "node --check viewer.js && node --check scroll-reveal.js && node --check server.cjs && node --check home/home.js && node --check home/journal.js && node --check home/frame.js && node --check home/brand.js && node --check home/pages.js && node --check models/models.js && node --check models/collection.js && node --check commission/commission.js",
+    "check": "node --check viewer.js && node --check model-crypto.js && node --check scroll-reveal.js && node --check server.cjs && node --check home/home.js && node --check home/journal.js && node --check home/frame.js && node --check home/brand.js && node --check home/pages.js && node --check models/models.js && node --check models/collection.js && node --check commission/commission.js",
     "test": "node test-preview.cjs",
     "test:home": "node test-frame.cjs",
     "test:opening": "node test-opening.cjs",

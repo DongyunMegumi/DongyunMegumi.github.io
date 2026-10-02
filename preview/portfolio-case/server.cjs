@@ -37,6 +37,7 @@ function resolveRoute(url) {
   if (url === '/asset/reference.png') return local.reference;
   if (url === '/asset/motion.gif') return local.motion;
   if (url === '/asset/matcap.png') return local.matcap;
+  if (url === '/model-crypto.js') return path.join(root, 'model-crypto.js');
   if (url === '/vendor/three-vrm.js') return path.join(root, 'node_modules/@pixiv/three-vrm/lib/three-vrm.module.min.js');
   if (url.startsWith('/vendor/three/')) return inside(path.join(root, 'node_modules/three'), url.slice('/vendor/three/'.length));
   if (url.startsWith('/characters/')) return inside(shared, url.slice('/characters/'.length) || 'index.html');

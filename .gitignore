@@ -5,3 +5,9 @@ db.json
 node_modules/
 public/
 .deploy_git/
+*.glb
+*.gltf
+*.vrm
+*.fbx
+*.blend
+.private-assets/
