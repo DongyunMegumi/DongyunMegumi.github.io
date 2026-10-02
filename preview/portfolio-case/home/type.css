@@ -1,0 +1,85 @@
+@font-face {
+  font-family: "Jost";
+  src: url("/home/fonts/jost.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans JP";
+  src: url("/home/fonts/noto-sans-jp.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans SC";
+  src: url("/home/fonts/noto-sans-sc.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+:root {
+  --sans:
+    "Noto Sans JP", "Noto Sans SC", "Noto Sans", YuGothic, "Yu Gothic Medium",
+    "Hiragino Kaku Gothic ProN", Meiryo, "Microsoft YaHei", sans-serif;
+  --latin: "Jost", var(--sans);
+  --serif: var(--sans);
+  --mono: var(--latin);
+}
+body {
+  font-family: var(--sans);
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+.desktop-nav,
+.entry-nav,
+.frame-section-label h2,
+.frame-footer nav,
+.micro-label,
+.project-type,
+.breadcrumb,
+.article-meta,
+.title-row h1,
+.models-page .models-title h1,
+.models-page .portrait-name,
+.models-page .process-entry h3,
+.models-page .sample-dialog h2,
+.models-page .rail-controls output,
+.about-name span {
+  font-family: var(--latin);
+  font-weight: 300;
+}
+code,
+pre,
+kbd {
+  font-family: "Cascadia Code", Consolas, monospace;
+}
+* {
+  letter-spacing: 0;
+}
+.article-page {
+  --paper: #454b55;
+  --ink: #f4f4f4;
+  --rule: #cdd2db;
+  --pink: #915e72;
+}
+.article-page .article-body {
+  color: #454b55;
+}
+.article-page .article-body pre {
+  background: #e8eaee;
+}
+.article-page .article-body code {
+  font-family: "Cascadia Code", Consolas, monospace;
+}
+.article-page .article-meta {
+  color: #76808d;
+}
+.article-page .brand-image {
+  width: 180px;
+}

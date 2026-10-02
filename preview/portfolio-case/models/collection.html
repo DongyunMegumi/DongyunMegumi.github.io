@@ -1,0 +1,139 @@
+<div class="model-collection" data-model-collection>
+  <div class="collection-toolbar">
+    <div class="collection-filters" role="group" aria-label="模型类型">
+      <button type="button" data-model-filter="all" aria-pressed="true">
+        全部
+      </button>
+      <button type="button" data-model-filter="vtuber" aria-pressed="false">
+        VTuber
+      </button>
+      <button type="button" data-model-filter="game" aria-pressed="false">
+        游戏模型
+      </button>
+    </div>
+    <span class="collection-count" aria-live="polite"
+      >01 VTuber / 03 游戏模型制作计划</span
+    >
+  </div>
+  <div class="portrait-rail" aria-label="角色作品选择">
+    <a
+      class="portrait-card model-case"
+      data-model-type="vtuber"
+      href="/models/sumi/?mode=pair#showcase"
+      aria-label="进入 Sumi VTuber 模型展示"
+      title="Sumi · VTuber 模型展示"
+    >
+      <div class="portrait-visual">
+        <img
+          class="portrait-art"
+          src="/home/assets/sumi-portrait.png"
+          alt=""
+          width="1200"
+          height="1400"
+          loading="lazy"
+        />
+      </div>
+      <span class="portrait-name">SUMI</span
+      ><small class="portrait-number" aria-hidden="true">VTUBER / 01</small
+      ><i class="portrait-marker" aria-hidden="true"></i
+      ><span class="portrait-status">VTUBER / SUMI</span>
+    </a>
+    <a
+      class="portrait-card sample-case"
+      data-model-type="game"
+      data-sample="CHARACTER 01"
+      href="/characters/assets/images/display/char-01-cutout.png"
+      aria-label="查看 CHARACTER 01 游戏模型制作计划"
+      title="CHARACTER 01 · 游戏模型制作计划"
+    >
+      <div class="portrait-visual">
+        <img
+          class="portrait-art"
+          src="/characters/assets/images/display/char-01-cutout.png"
+          alt=""
+          loading="lazy"
+        />
+      </div>
+      <span class="portrait-name">CHARACTER 01</span
+      ><small class="portrait-number" aria-hidden="true">GAME / 01</small
+      ><i class="portrait-marker" aria-hidden="true"></i
+      ><span class="portrait-status">游戏模型 / 制作计划</span>
+    </a>
+    <a
+      class="portrait-card sample-case"
+      data-model-type="game"
+      data-sample="CHARACTER 02"
+      href="/characters/assets/images/display/char-02-cutout.png"
+      aria-label="查看 CHARACTER 02 游戏模型制作计划"
+      title="CHARACTER 02 · 游戏模型制作计划"
+    >
+      <div class="portrait-visual">
+        <img
+          class="portrait-art"
+          src="/characters/assets/images/display/char-02-cutout.png"
+          alt=""
+          loading="lazy"
+        />
+      </div>
+      <span class="portrait-name">CHARACTER 02</span
+      ><small class="portrait-number" aria-hidden="true">GAME / 02</small
+      ><i class="portrait-marker" aria-hidden="true"></i
+      ><span class="portrait-status">游戏模型 / 制作计划</span>
+    </a>
+    <a
+      class="portrait-card sample-case"
+      data-model-type="game"
+      data-sample="CHARACTER 03"
+      href="/characters/assets/images/char-03.png"
+      aria-label="查看 CHARACTER 03 游戏模型制作计划"
+      title="CHARACTER 03 · 游戏模型制作计划"
+    >
+      <div class="portrait-visual">
+        <img
+          class="portrait-art"
+          src="/characters/assets/images/char-03.png"
+          alt=""
+          loading="lazy"
+        />
+      </div>
+      <span class="portrait-name">CHARACTER 03</span
+      ><small class="portrait-number" aria-hidden="true">GAME / 03</small
+      ><i class="portrait-marker" aria-hidden="true"></i
+      ><span class="portrait-status">游戏模型 / 制作计划</span>
+    </a>
+  </div>
+  <div class="rail-controls" hidden>
+    <button
+      type="button"
+      data-rail-step="-1"
+      aria-label="上一组角色"
+      title="上一组角色"
+    >
+      <i data-lucide="arrow-left" aria-hidden="true"></i>
+    </button>
+    <output>01 / 04</output>
+    <button
+      type="button"
+      data-rail-step="1"
+      aria-label="下一组角色"
+      title="下一组角色"
+    >
+      <i data-lucide="arrow-right" aria-hidden="true"></i>
+    </button>
+  </div>
+  <dialog class="sample-dialog" aria-labelledby="sampleTitle" id="sampleDialog">
+    <button
+      class="sample-close"
+      type="button"
+      aria-label="关闭游戏模型计划"
+      title="关闭"
+    >
+      <i data-lucide="x" aria-hidden="true"></i>
+    </button>
+    <img id="sampleImage" alt="" />
+    <div>
+      <h2 id="sampleTitle">游戏模型制作计划</h2>
+      <p>游戏模型制作计划 / 当前展示参考立绘，尚未接入成品模型。</p>
+    </div>
+  </dialog>
+</div>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="東雲 MEGUMI 的角色作品案例：参考立绘、模型与制作过程。">
+  <title>Sumi | 東雲 MEGUMI</title>
+  <link rel="stylesheet" href="/characters/character-cards.css">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/home/brand.css">
+  <link rel="stylesheet" href="/home/type.css">
+  <script src="/characters/assets/vendor/lucide.min.js" defer></script>
+  <script src="/characters/character-cards.js" defer></script>
+  <script type="importmap">
+    {"imports":{"three":"/vendor/three/build/three.module.js","three/addons/":"/vendor/three/examples/jsm/","@pixiv/three-vrm":"/vendor/three-vrm.js"}}
+  </script>
+  <script type="module" src="/viewer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#showcase">跳转到作品</a>
+  <header class="site-header wrap">
+    <a class="brand brand-logo" href="/" aria-label="東雲 Megumi 首页"><img class="brand-image" data-brand="light" src="/home/assets/brand.png" alt="東雲 Megumi" width="2076" height="758"></a>
+    <nav class="desktop-nav" aria-label="主要导航">
+      <a href="/models/">模型总览</a><a href="#details">制作细节</a><a href="#motion">动态展示</a>
+      <a href="/news/">手记</a>
+    </nav>
+    <a class="commission-link" href="/commission/">委托咨询<i data-lucide="arrow-up-right" aria-hidden="true"></i></a>
+  </header>
+
+  <main>
+    <section class="case-heading wrap" aria-labelledby="caseTitle" data-scroll-reveal>
+      <div class="breadcrumb"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/models/">模型总览</a><span aria-hidden="true">/</span><span>Sumi</span></div>
+      <div class="title-row"><div><h1 id="caseTitle">Sumi<span>スミ</span></h1><p class="project-type">Character Modeling · Texture · VRM</p></div><span class="local-label">本地测试案例</span></div>
+    </section>
+
+    <section class="showcase wrap" id="showcase" aria-label="立绘与模型展示" data-scroll-reveal>
+      <div class="showcase-bar">
+        <div class="mode-tabs" role="tablist" aria-label="展示模式">
+          <button id="mode-pair" role="tab" aria-selected="true" aria-controls="showcasePanel" data-mode="pair">立绘与模型</button>
+          <button id="mode-compare" role="tab" aria-selected="false" aria-controls="showcasePanel" tabindex="-1" data-mode="compare">白模与贴图</button>
+        </div>
+      </div>
+
+      <div class="showcase-panel" id="showcasePanel" role="tabpanel" aria-labelledby="mode-pair" data-mode="pair">
+        <figure class="reference-figure">
+          <figcaption class="stage-caption"><span>01</span> 参考立绘 <button class="icon-button" id="openReference" title="查看完整设定图" aria-label="查看完整设定图"><i data-lucide="expand" aria-hidden="true"></i></button></figcaption>
+          <div class="reference-crop" id="referenceCrop" data-angle="front"><img id="referenceImage" src="/asset/reference.png" alt="Sumi 角色设定图正面" fetchpriority="high"></div>
+          <div class="reference-views" role="group" aria-label="立绘视角"><button data-angle="back" aria-pressed="false">背面</button><button data-angle="front" aria-pressed="true">正面</button><button data-angle="side" aria-pressed="false">侧面</button></div>
+        </figure>
+        <div class="model-figure">
+          <div class="stage-caption"><span>02</span><span id="modelCaption">3D 模型</span><span class="model-live" id="liveLabel" hidden><span aria-hidden="true"></span>实时</span></div>
+          <div class="model-canvas" id="modelCanvas">
+            <div class="load-state" id="loadState" role="status"><span class="loading-ring" aria-hidden="true"></span><span id="loadText">正在加载模型</span><progress id="loadProgress" max="100" value="0" aria-label="模型加载进度"></progress><button id="retryModel" hidden>重新加载</button></div>
+            <div class="comparison-overlay" id="comparisonOverlay" hidden>
+              <span class="compare-label clay-label">白模</span><span class="compare-label texture-label">基础贴图</span>
+              <div class="split-line" id="splitLine"><span class="split-grip" aria-hidden="true"><i data-lucide="move-horizontal"></i></span></div>
+            </div>
+          </div>
+          <div class="model-bottom-bar">
+            <input id="splitRange" type="range" min="0" max="100" value="50" aria-label="白模与贴图分界线" aria-valuetext="白模 50%，贴图 50%" hidden>
+            <div class="model-tools" role="group" aria-label="模型操作">
+              <button class="icon-button" id="autoRotate" title="自动旋转" aria-label="自动旋转" aria-pressed="false" disabled><i data-lucide="rotate-3d" aria-hidden="true"></i></button>
+              <button class="icon-button" id="resetView" title="恢复全身正面视角" aria-label="恢复正面视角" disabled><i data-lucide="rotate-ccw" aria-hidden="true"></i></button>
+              <button class="icon-button" id="fullscreen" title="全屏查看模型" aria-label="全屏查看模型" aria-pressed="false" disabled><i data-lucide="maximize" aria-hidden="true"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="case-caption"><p>Model <span>Megumi</span></p><p>Reference <span>原画署名待确认</span></p><a href="#modelDetails">模型信息<i data-lucide="arrow-down-right" aria-hidden="true"></i></a></div>
+    </section>
+
+    <section class="detail-section wrap" id="details" aria-labelledby="detailsTitle" data-scroll-reveal>
+      <div class="section-heading"><p class="section-number">01 / DETAILS</p><h2 id="detailsTitle">角色的每一处细节。</h2></div>
+      <div class="detail-grid">
+        <figure class="detail-item"><div class="detail-picture"><img id="detailFace" alt="Sumi 面部模型特写" hidden><span class="detail-placeholder">面部</span></div><figcaption class="detail-title">面部造型<span>Face modeling</span></figcaption></figure>
+        <figure class="detail-item"><div class="detail-picture"><img id="detailOutfit" alt="Sumi 服装与配件模型特写" hidden><span class="detail-placeholder">服装</span></div><figcaption class="detail-title">服装与配件<span>Clothing & accessories</span></figcaption></figure>
+        <figure class="detail-item"><div class="detail-picture"><img id="detailBack" alt="Sumi 模型背面" hidden><span class="detail-placeholder">背面</span></div><figcaption class="detail-title">背面与轮廓<span>Silhouette & back view</span></figcaption></figure>
+      </div>
+      <details class="model-details" id="modelDetails"><summary>模型信息<i data-lucide="plus" aria-hidden="true"></i></summary><dl><div><dt>三角面</dt><dd id="triangleCount">—</dd></div><div><dt>显示方式</dt><dd>平面纹理</dd></div><div><dt>网页测试格式</dt><dd>VRM 0.x</dd></div><div><dt>模型作者</dt><dd>Megumi</dd></div></dl></details>
+    </section>
+
+    <section class="motion-section wrap" id="motion" aria-labelledby="motionTitle" data-scroll-reveal>
+      <div class="motion-heading"><p class="section-number">02 / MOTION</p><h2 id="motionTitle">动态展示</h2><p class="motion-name">Sumi<span>スミ</span></p><dl class="motion-meta"><div><dt>作品</dt><dd>Sumi</dd></div><div><dt>媒体</dt><dd>GIF</dd></div><div><dt>模型</dt><dd>Megumi</dd></div></dl></div>
+      <figure class="motion-figure">
+        <div class="motion-stage"><img id="motionImage" alt="Sumi 角色动作演示" hidden><p id="motionStatus" role="status">正在加载动态展示</p></div>
+        <figcaption class="motion-caption"><span>Sumi · Motion</span><div class="motion-tools"><button class="icon-button" id="motionPlay" title="停止动态展示" aria-label="停止动态展示" aria-pressed="true" disabled><i data-lucide="square" aria-hidden="true"></i></button><button class="icon-button" id="motionExpand" title="放大动态展示" aria-label="放大动态展示" disabled><i data-lucide="expand" aria-hidden="true"></i></button><button class="icon-button" id="motionRetry" title="重新加载动态展示" aria-label="重新加载动态展示" hidden><i data-lucide="refresh-cw" aria-hidden="true"></i></button></div></figcaption>
+      </figure>
+    </section>
+
+    <section class="works-section" id="works" aria-labelledby="worksTitle" data-scroll-reveal>
+      <div class="wrap section-heading"><p class="section-number">03 / COLLECTION</p><h2 id="worksTitle">模型总览</h2></div>
+      <div class="wrap work-status"><span>Sumi / 角色作品</span><a href="/models/">返回模型总览<i data-lucide="arrow-up-left" aria-hidden="true"></i></a></div>
+    </section>
+
+    <section class="contact-section wrap" aria-labelledby="contactTitle" data-scroll-reveal><p>COMMISSION</p><h2 id="contactTitle">让你的角色，走出画面。</h2><a href="https://vgen.co/DongyunMegumi" target="_blank" rel="noopener">联系委托<i data-lucide="arrow-up-right" aria-hidden="true"></i></a></section>
+  </main>
+
+  <footer class="site-footer wrap" data-scroll-reveal><a href="/" class="footer-brand">東雲 MEGUMI</a><span>© 2026 Megumi</span><a href="https://x.com/DongyunMegumi" target="_blank" rel="noopener">X / Twitter<i data-lucide="arrow-up-right" aria-hidden="true"></i></a></footer>
+  <dialog id="referenceDialog" aria-label="Sumi 完整角色设定图"><button class="icon-button close-dialog" id="closeReference" title="关闭设定图" aria-label="关闭设定图"><i data-lucide="x" aria-hidden="true"></i></button><img src="/asset/reference.png" alt="Sumi 正面、侧面、背面完整角色设定图"><p>Sumi · Character reference</p></dialog>
+  <dialog id="motionDialog" aria-label="Sumi 动态展示"><button class="icon-button close-dialog" id="closeMotion" title="关闭动态展示" aria-label="关闭动态展示"><i data-lucide="x" aria-hidden="true"></i></button><img id="motionDialogImage" alt="Sumi 角色动作演示放大画面"><div class="motion-dialog-caption"><p>Sumi · Motion</p><button class="icon-button" id="motionDialogPlay" title="停止动态展示" aria-label="停止动态展示" aria-pressed="true"><i data-lucide="square" aria-hidden="true"></i></button></div></dialog>
+</body>
+</html>

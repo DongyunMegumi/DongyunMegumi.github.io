@@ -1,0 +1,8 @@
+.local.json
+.local-assets/
+*.log
+test-output/
+*.vrm
+*.fbx
+*.glb
+*.gltf
