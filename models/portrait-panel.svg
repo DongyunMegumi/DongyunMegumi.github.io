@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="255" height="565" viewBox="0 0 255 565" preserveAspectRatio="none" shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#e6e8e7"/>
+      <stop offset="0.35" stop-color="#d3dddd"/>
+      <stop offset="0.7" stop-color="#a4dcd7"/>
+      <stop offset="1" stop-color="#65c9c8"/>
+    </linearGradient>
+    <pattern id="texture" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(40)">
+      <rect width="5" height="12" fill="#ffffff" fill-opacity="0.08"/>
+    </pattern>
+    <clipPath id="panel">
+      <path d="M31 86 240 42V498L31 542Z"/>
+    </clipPath>
+  </defs>
+  <path fill="#25232d" fill-opacity="0.45" d="M23 98 232 54V510L23 554Z"/>
+  <path fill="#c3c3c7" fill-opacity="0.58" d="M39 74 248 30V486L39 530Z"/>
+  <path fill="url(#paper)" stroke="#dee0e2" stroke-width="2" vector-effect="non-scaling-stroke" d="M31 86 240 42V498L31 542Z"/>
+  <rect width="255" height="565" fill="url(#texture)" clip-path="url(#panel)"/>
+  <path fill="none" stroke="#87d2cf" stroke-width="1" vector-effect="non-scaling-stroke" d="M33 87.578947 238 44.421053V496.421053L33 539.578947Z"/>
+  <path fill="none" stroke="#b7dfdc" stroke-opacity="0.66" stroke-width="1" vector-effect="non-scaling-stroke" d="M8 78 217 34V486L8 530Z"/>
+</svg>

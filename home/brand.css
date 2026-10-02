@@ -1,0 +1,24 @@
+.brand-image {
+  display: block;
+  width: 190px;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+.brand-image.is-prepared[data-brand="dark"] {
+  filter: brightness(1.65);
+}
+.brand-logo {
+  display: block;
+  flex-shrink: 0;
+  max-width: 48%;
+}
+.brand-logo:focus-visible {
+  outline: 2px solid #c7c5ec;
+  outline-offset: 4px;
+}
+@media (max-width: 760px) {
+  .brand-image {
+    width: 155px;
+  }
+}

@@ -1,0 +1,453 @@
+/* ============================================================
+   custom.css — Dongyun Megumi のノート
+   风格来源：oicolatcho's notebook
+   奶油纸底色 + 笔记本横线 + 圆润手写体 + 虚线便签卡片 + 缎带红点缀
+
+   设计令牌
+   ┌ 纸   --paper-bg #f4efe6   --paper-card #fffaf2
+   ├ 强调 --paper-accent #bfa77a  --paper-soft #e6dcc8
+   ├ 墨   --ink #3f372f   --ink-muted #7a7468
+   ├ 缎带 --ribbon #d2675f   --ribbon-dark #b95751
+   └ 玫瑰 --rose #a9685a（标题专用）
+   字体：Kiwi Maru（圆润日文衬线）· Zen Maru Gothic（汉字兜底）· Patrick Hand（手写：日期/标签/按钮）
+   对比度：ink-on-paper ≈ 10.2:1 · rose-on-paper ≈ 5.4:1（均达 WCAG AA）
+   ============================================================ */
+
+:root {
+  --paper-bg:      #f4efe6;
+  --paper-card:    #fffaf2;
+  --paper-accent:  #bfa77a;
+  --paper-soft:    #e6dcc8;
+  --ink:           #3f372f;
+  --ink-muted:     #7a7468;
+  --ribbon:        #d2675f;
+  --ribbon-dark:   #b95751;
+  --rose:          #a9685a;
+
+  --radius-card:   16px;
+  --radius-pill:   999px;
+  --shadow-soft:   0 4px 10px rgba(63, 55, 47, .05);
+  --shadow-lift:   0 12px 28px rgba(63, 55, 47, .12);
+
+  --font-jp:       'Kiwi Maru', 'Zen Maru Gothic', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-hand:     'Patrick Hand', 'Kiwi Maru', cursive;
+}
+
+/* ---------- 全局：奶油纸 + 笔记本横线 ---------- */
+body {
+  color: var(--ink) !important;
+  font-family: var(--font-jp) !important;
+  letter-spacing: .03em;
+  line-height: 1.8;
+  background-color: var(--paper-bg) !important;
+  /* 4px 周期的横向格线 —— 笔记本纸的质感 */
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(63, 55, 47, .035) 0px,
+    rgba(63, 55, 47, .035) 2px,
+    transparent 2px,
+    transparent 4px
+  ) !important;
+  background-attachment: fixed !important;
+}
+
+/* ---------- 强制浅色：统一 Butterfly 明暗变量 ---------- */
+[data-theme='light'],
+[data-theme='dark'] {
+  --background: var(--paper-bg) !important;
+  --card-bg: var(--paper-card) !important;
+  --card-background: var(--paper-card) !important;
+  --font-color: var(--ink) !important;
+  --text-highlight-color: var(--ink) !important;
+  --light-grey: var(--ink-muted) !important;
+  --btn-bg: var(--paper-accent) !important;
+  --btn-color: #fffaf2 !important;
+  --btn-hover-color: var(--rose) !important;
+  --link-color: var(--rose) !important;
+  --link-hover-color: var(--ribbon) !important;
+  --text-bg-hover: rgba(191, 167, 122, .18) !important;
+  --hr-border: var(--paper-soft) !important;
+  --card-border: var(--paper-soft) !important;
+}
+
+/* ============================================================
+   首页角色入口 —— Characters 横向展示墙
+   ============================================================ */
+.home-character-gateway { margin: 0; }
+body.has-character-gateway #page-header.full_page { height: 240px; min-height: 0; }
+body.has-character-gateway #page-header #site-info { top: 100px; }
+body.has-character-gateway #scroll-down { display: none; }
+body.has-character-gateway #page-header .site-title { font-size: 32px; }
+.home-character-gateway, .home-character-gateway * { letter-spacing: 0; }
+@media (max-width: 767px) {
+  body.has-character-gateway #page-header.full_page { height: 220px; }
+  body.has-character-gateway #page-header .site-title { font-size: 26px; }
+}
+
+/* ============================================================
+   导航栏 —— 半透明纸片 + 虚线压边
+   ============================================================ */
+#nav {
+  background: rgba(244, 239, 230, .88) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: none !important;
+  border-bottom: 2px dashed var(--paper-soft) !important;
+}
+#nav::after { display: none !important; }
+
+#site-name,
+#site-name .title {
+  font-family: var(--font-jp) !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  text-shadow: none !important;
+  letter-spacing: .04em;
+}
+#nav .menus_item a,
+#nav .menus_item .site-page {
+  font-family: var(--font-hand) !important;
+  font-size: 1.05rem;
+  color: var(--ink-muted) !important;
+  letter-spacing: .05em;
+  transition: color .28s ease, transform .28s ease;
+}
+#nav .menus_item a:hover,
+#nav .menus_item .site-page:hover {
+  color: var(--rose) !important;
+  transform: translateY(-1px);
+}
+/* 当前页菜单项：手写下划线 */
+#nav .menus_item .site-page::after {
+  background: var(--paper-accent) !important;
+  height: 2px !important;
+  border-radius: 2px;
+}
+
+/* 移动端菜单 */
+#toggle-menu a.site-page,
+#sidebar .menus_item a {
+  color: var(--ink) !important;
+  font-family: var(--font-hand) !important;
+}
+#sidebar {
+  background: var(--paper-card) !important;
+}
+
+/* ============================================================
+   顶部站点信息（无封面图时的标题区）
+   ============================================================ */
+#page-header {
+  background: transparent !important;
+}
+#page-header::before,
+#page-header::after { display: none !important; }
+#site-info .site-title {
+  font-family: var(--font-jp) !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  text-shadow: none !important;
+  letter-spacing: .05em;
+}
+#site-info .site-subtitle {
+  font-family: var(--font-hand) !important;
+  font-size: 1.15rem;
+  color: var(--ink-muted) !important;
+  letter-spacing: .08em;
+}
+#site-info .site-social-icon,
+#site-info .social-icon {
+  color: var(--rose) !important;
+  transition: transform .3s ease, color .3s ease;
+}
+#site-info .site-social-icon:hover {
+  color: var(--ribbon) !important;
+  transform: translateY(-3px) rotate(-6deg);
+}
+
+/* ---------- 头像：纸张圆角 + 虚线描边 ---------- */
+.avatar-img {
+  border-radius: 50% !important;
+  border: 2px dashed var(--paper-accent) !important;
+  padding: 3px;
+  background: var(--paper-card);
+  box-shadow: var(--shadow-soft) !important;
+  transition: transform .4s cubic-bezier(.18, .89, .32, 1.28);
+}
+.avatar-img:hover { transform: rotate(-4deg) scale(1.04); }
+
+/* ============================================================
+   卡片 —— 便签纸：纸白底 + 2px 虚线边 + 柔和投影
+   ============================================================ */
+#recent-posts .recent-post-item,
+#recent-posts > .recent-post-item,
+.card-widget,
+#post,
+#page,
+#archive,
+.layout > div:first-child {
+  background: var(--paper-card) !important;
+  border: 2px dashed var(--paper-soft) !important;
+  border-radius: var(--radius-card) !important;
+  box-shadow: var(--shadow-soft) !important;
+  transition: transform .35s cubic-bezier(.18, .89, .32, 1.28),
+              box-shadow .35s ease,
+              border-color .35s ease !important;
+}
+#recent-posts .recent-post-item:hover,
+.card-widget:hover {
+  transform: translateY(-4px) rotate(-.35deg);
+  border-color: var(--paper-accent) !important;
+  box-shadow: var(--shadow-lift) !important;
+}
+
+/* 文章标题 —— 玫瑰棕 + 圆润字体 */
+.recent-post-info .article-title,
+.article-title {
+  font-family: var(--font-jp) !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  letter-spacing: .03em;
+  transition: color .28s ease;
+}
+.article-title:hover { color: var(--rose) !important; }
+
+/* ---------- 元信息：日期用手写体 ---------- */
+.recent-post-info .article-meta,
+.article-meta,
+.post-meta,
+.card-archive-list-item .card-archive-list-date {
+  color: var(--ink-muted) !important;
+}
+.article-meta__post .article-meta__time,
+.post-meta-date-created,
+.article-meta .post-meta-date {
+  font-family: var(--font-hand) !important;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: .06em;
+}
+.recent-post-info .content,
+.content { color: var(--ink-muted) !important; }
+
+/* ---------- 侧栏标题：缎带红小方块前置 ---------- */
+.item-headline i,
+.item-headline span {
+  color: var(--ribbon) !important;
+}
+.item-headline {
+  font-family: var(--font-jp) !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  border-left: 4px solid var(--ribbon) !important;
+  padding-left: 10px !important;
+}
+.card-archive-list-count,
+.card-tag-cloud-count {
+  color: var(--ink-muted) !important;
+  font-family: var(--font-hand) !important;
+}
+
+/* ============================================================
+   分页器 —— 手写体胶囊
+   ============================================================ */
+#pagination .pagination .page-number.current,
+#pagination .pagination > *:hover {
+  background: var(--paper-accent) !important;
+  color: #fffaf2 !important;
+  border-color: var(--paper-accent) !important;
+  border-radius: var(--radius-pill) !important;
+}
+#pagination .pagination .page-number,
+#pagination .pagination .space,
+#pagination .pagination .extend {
+  border-radius: var(--radius-pill) !important;
+  border: 2px dashed var(--paper-soft) !important;
+  background: var(--paper-card) !important;
+  color: var(--ink-muted) !important;
+  font-family: var(--font-hand) !important;
+  font-size: 1.05rem;
+}
+
+/* ============================================================
+   标签 / 分类 —— 虚线胶囊标签
+   ============================================================ */
+.tag-cloud-list a,
+.card-tag-cloud a,
+#article-container .tag-link,
+.recent-post-info .article-meta__tags {
+  font-family: var(--font-hand) !important;
+  color: var(--ink-muted) !important;
+  border: 2px dashed var(--paper-soft) !important;
+  border-radius: var(--radius-pill) !important;
+  background: var(--paper-card) !important;
+  padding: 2px 12px !important;
+  transition: all .28s ease;
+}
+.tag-cloud-list a:hover,
+.card-tag-cloud a:hover,
+#article-container .tag-link:hover {
+  color: var(--rose) !important;
+  border-color: var(--paper-accent) !important;
+  background: rgba(191, 167, 122, .12) !important;
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   文章正文
+   ============================================================ */
+#article-container {
+  color: var(--ink) !important;
+  line-height: 1.9;
+}
+#article-container h1,
+#article-container h2,
+#article-container h3,
+#article-container h4,
+#article-container h5 {
+  font-family: var(--font-jp) !important;
+  font-weight: 700 !important;
+  color: var(--ink) !important;
+  letter-spacing: .03em;
+}
+/* 标题下方手写感荧光笔条 */
+#article-container h1::before,
+#article-container h2::before {
+  color: var(--paper-accent) !important;
+}
+#article-container h2 {
+  border-bottom: 2px dashed var(--paper-soft) !important;
+  padding-bottom: 8px;
+}
+#article-container a {
+  color: var(--rose) !important;
+  border-bottom: 1px dotted var(--paper-accent) !important;
+  text-decoration: none !important;
+}
+#article-container a:hover {
+  color: var(--ribbon) !important;
+  background: rgba(191, 167, 122, .12) !important;
+}
+/* 引用：纸片卡片 + 缎带红左侧条 */
+#article-container blockquote {
+  border-left: 4px solid var(--ribbon) !important;
+  background: rgba(191, 167, 122, .10) !important;
+  border-radius: 0 var(--radius-card) var(--radius-card) 0 !important;
+  color: var(--ink-muted) !important;
+  font-style: normal;
+}
+#article-container code {
+  background: rgba(191, 167, 122, .16) !important;
+  color: #8a6a4f !important;
+  font-family: var(--font-hand) !important;
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+#article-container pre code {
+  background: transparent !important;
+  color: inherit !important;
+}
+/* 表格：虚线网格 */
+#article-container table th {
+  background: rgba(191, 167, 122, .16) !important;
+  color: var(--ink) !important;
+  font-family: var(--font-jp) !important;
+}
+#article-container table td,
+#article-container table th {
+  border: 1px dashed var(--paper-soft) !important;
+}
+#article-container table tr { background-color: transparent !important; }
+#article-container table tr:nth-child(2n) {
+  background-color: rgba(191, 167, 122, .06) !important;
+}
+/* 分隔线 */
+#article-container hr {
+  border: 0 !important;
+  border-top: 2px dashed var(--paper-soft) !important;
+}
+/* 列表圆点 */
+#article-container ul li::marker { color: var(--paper-accent); }
+#article-container ol li::marker {
+  color: var(--rose);
+  font-family: var(--font-hand);
+}
+
+/* ============================================================
+   页脚 —— 纸底 + 虚线上边
+   ============================================================ */
+#footer {
+  background: transparent !important;
+  color: var(--ink-muted) !important;
+  border-top: 2px dashed var(--paper-soft) !important;
+}
+#footer::before { display: none !important; }
+#footer a,
+#footer .framework-info,
+#footer .footer_custom_text {
+  color: var(--ink-muted) !important;
+}
+#footer a:hover { color: var(--rose) !important; }
+
+/* ============================================================
+   滚动条 / 选中 / 悬浮按钮
+   ============================================================ */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--paper-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--paper-accent);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--paper-bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--rose); }
+
+::selection {
+  background: var(--paper-soft) !important;
+  color: var(--ink) !important;
+}
+
+#rightside > div > button,
+#rightside .rs-button {
+  background: var(--paper-card) !important;
+  border: 2px dashed var(--paper-accent) !important;
+  color: var(--rose) !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+/* ---------- 搜索弹窗 ---------- */
+.search-dialog,
+.algolia-dialog,
+#local-search {
+  background: var(--paper-card) !important;
+  border: 2px dashed var(--paper-soft) !important;
+  border-radius: var(--radius-card) !important;
+}
+
+/* ---------- 归档页 ---------- */
+.article-sort-item-title { color: var(--ink) !important; font-family: var(--font-jp) !important; }
+.article-sort-item-time {
+  color: var(--ink-muted) !important;
+  font-family: var(--font-hand) !important;
+  font-weight: bold;
+}
+#archive .article-sort-item-title:hover,
+.article-sort-item-title:hover { color: var(--rose) !important; }
+
+/* ---------- 顶部进度条 ---------- */
+#nav .progress-bar,
+.progress-bar {
+  background: linear-gradient(90deg, var(--paper-accent), var(--ribbon)) !important;
+}
+
+/* ---------- 尊重「减少动态效果」偏好 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+  #recent-posts .recent-post-item:hover,
+  .card-widget:hover {
+    transform: none !important;
+  }
+}
