@@ -80,9 +80,10 @@ for (const directory of ['build', 'examples/jsm']) {
 write('vendor/three-vrm.js', fs.readFileSync(path.join(vendor, '@pixiv/three-vrm/lib/three-vrm.module.min.js')));
 write('vendor/three/LICENSE', fs.readFileSync(path.join(vendor, 'three/LICENSE')));
 write('vendor/three-vrm-LICENSE', fs.readFileSync(path.join(vendor, '@pixiv/three-vrm/LICENSE')));
-for (const slug of ['hello-portfolio', 'blender-bmesh-free']) {
-  const article = frontMatter.parse(fs.readFileSync(path.join(root, 'source/_posts', slug + '.md'), 'utf8'));
-  write(`home/post/${slug}.json`, JSON.stringify({ title: article.title, html: marked.parse(article._content) }));
+for (const slug of ['hello-portfolio', 'blender-bmesh-free', 'xin-yue-hu-texture-model-guide']) {
+  const article = frontMatter.parse(fs.readFileSync(path.join(root, 'source/_posts', slug + '.md'), 'utf8').replace(/\r\n/g, '\n'));
+  const date = new Date(article.date).toISOString().slice(0, 10).replaceAll('-', '.');
+  write(`home/post/${slug}.json`, JSON.stringify({ title: article.title, date, html: marked.parse(article._content) }));
 }
 write('.nojekyll', '');
 function assertNoPlainModels(directory) {

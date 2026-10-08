@@ -67,9 +67,12 @@ kbd {
   --ink: #f4f4f4;
   --rule: #cdd2db;
   --pink: #915e72;
+  background: #f5f6fa;
+  color: #454b55;
 }
 .article-page .article-body {
   color: #454b55;
+  font-size: 16px;
 }
 .article-page .article-body pre {
   background: #e8eaee;
@@ -79,6 +82,73 @@ kbd {
 }
 .article-page .article-meta {
   color: #76808d;
+}
+
+.article-body img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.article-body figure {
+  margin: 36px 0;
+}
+.article-body figcaption {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #697482;
+}
+.article-body h3 {
+  margin: 38px 0 16px;
+  font-size: 21px;
+  line-height: 1.6;
+}
+.article-body h4 {
+  margin: 28px 0 12px;
+  font-size: 17px;
+}
+.article-body ol,
+.article-body ul {
+  padding-left: 1.8em;
+}
+.article-body li + li {
+  margin-top: 8px;
+}
+.article-body a {
+  color: #49659c;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.article-body a[id] {
+  scroll-margin-top: 24px;
+}
+.article-toc {
+  padding: 18px 24px;
+  border: 1px solid #cdd2db;
+  border-radius: 8px;
+  background: #f6f7fa;
+}
+.article-toc summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.article-table {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 24px 0;
+  overscroll-behavior-x: contain;
+}
+.article-table table {
+  min-width: 640px;
+}
+.article-table:focus-visible {
+  outline: 2px solid #49659c;
+  outline-offset: 4px;
+}
+@media (max-width: 600px) {
+  .article-page .article-body {
+    font-size: 15px;
+  }
 }
 .article-page .brand-image {
   width: 180px;
