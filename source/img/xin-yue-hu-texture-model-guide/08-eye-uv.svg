@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 860" role="img" aria-labelledby="title desc">
+<title id="title">眼睛图集与专用UV的分工</title>
+<desc id="desc">颜色纹理在图集左下角，特效以归一化眼睛UV计算，再将视差位移缩放回图集。本案例比例约为0.270023。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="#657687"/></marker></defs>
+<style>text{font-family:'Microsoft YaHei','Noto Sans SC',sans-serif;fill:#354454}.title{font-size:34px;font-weight:700}.sub{font-size:22px;fill:#657687}.label{font-size:26px;font-weight:700}.body{font-size:22px}.small{font-size:19px;fill:#657687}.mono{font-family:Consolas,monospace;font-size:22px}.line{stroke:#657687;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+<rect width="1320" height="860" fill="#f5f6fa"/>
+<text x="55" y="66" class="title">眼睛在图集里，特效需要自己的坐标</text>
+<text x="55" y="108" class="sub">保留颜色图与原UV；把视差和节点高光放到明确的0～1眼睛区域</text>
+<rect x="55" y="145" width="560" height="455" rx="18" fill="#fff" stroke="#d5dbe3"/>
+<text x="85" y="190" class="label">颜色采样：UVMap → Head.png</text>
+<rect x="110" y="220" width="292" height="292" fill="#e8edf3" stroke="#7b8c9c" stroke-width="2"/>
+<rect x="128" y="236" width="252" height="176" rx="15" fill="#d8e0e9"/>
+<text x="162" y="319" class="small">脸、耳朵等</text><text x="173" y="350" class="small">其他图集区域</text>
+<rect x="115.5" y="432" width="78.8" height="78.8" fill="#f7dae6" stroke="#ae6081" stroke-width="2"/>
+<ellipse cx="155" cy="471" rx="31" ry="33" fill="#d88da8" stroke="#9b526d" stroke-width="2"/>
+<circle cx="155" cy="471" r="9" fill="#563c60"/>
+<path d="M197 471H423" class="line"/>
+<text x="422" y="450" class="small">眼睛只占</text><text x="422" y="481" class="small">一小块</text>
+<text x="100" y="543" class="small">U →</text><text x="85" y="241" class="small">V</text>
+<text x="85" y="575" class="body">图集中的中心 ≠ (0.5, 0.5)</text>
+<rect x="705" y="145" width="560" height="455" rx="18" fill="#fff" stroke="#d5dbe3"/>
+<text x="735" y="190" class="label">特效采样：Ho_EyeUV</text>
+<rect x="778" y="220" width="292" height="292" fill="#faedf2" stroke="#ae6081" stroke-width="2"/>
+<circle cx="924" cy="366" r="119" fill="#f0c2d4" stroke="#ae6081" stroke-width="2"/>
+<path d="M778 366H1070M924 220V512" stroke="#ba839b" stroke-dasharray="6 7" fill="none"/>
+<circle cx="924" cy="366" r="27" fill="#563c60"/>
+<circle cx="966" cy="323" r="9" fill="#fff"/>
+<text x="1090" y="315" class="small">中心</text><text x="1090" y="347" class="small">(0.5, 0.5)</text>
+<text x="774" y="543" class="small">0</text><text x="1058" y="543" class="small">1 → U</text>
+<text x="735" y="575" class="body">用于虹膜视差与节点高光</text>
+<path d="M628 354H690" class="line"/>
+<text x="628" y="321" class="small">分工</text>
+<rect x="55" y="638" width="1210" height="163" rx="18" fill="#e8edf3"/>
+<text x="82" y="679" class="label">把特效位移缩放回原图集</text>
+<text x="82" y="719" class="mono">delta = clamp(Parallax(q), 0, 1) - q</text>
+<text x="82" y="756" class="mono">AtlasUV = UVMap + delta * (0.270023, 0.270023)</text>
+<text x="55" y="837" class="small">本案例的比例来自两套UV对应关系；其他模型应重新核对。Ho_EyeUV不承担描边法线编码。</text>
+</svg>

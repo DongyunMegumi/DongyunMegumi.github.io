@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 810" role="img" aria-labelledby="title desc">
+<title id="title">虹膜的可调最低亮度</title>
+<desc id="desc">带高光的原色分别用于光照与最低颜色计算，两者逐分量取最大值，再用HET范围控制HSV提亮。最低比例0.55，HSV亮度1.8。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 10 5 0 10" fill="#657687"/></marker></defs>
+<style>text{font-family:'Microsoft YaHei','Noto Sans SC',sans-serif;fill:#354454}.title{font-size:34px;font-weight:700}.sub{font-size:22px;fill:#657687}.label{font-size:26px;font-weight:700}.body{font-size:22px}.small{font-size:19px;fill:#657687}.mono{font-family:Consolas,monospace;font-size:24px}.line{stroke:#657687;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+<rect width="1320" height="810" fill="#f5f6fa"/>
+<text x="55" y="64" class="title">虹膜不够亮：分别控制受光与阴影下限</text>
+<text x="55" y="107" class="sub">新增于自用眼睛材质；原光照、高光资源与共享shader继续使用</text>
+<rect x="45" y="249" width="262" height="148" rx="16" fill="#f7dae6" stroke="#dca8bd"/>
+<text x="70" y="292" class="label">颜色 + 节点高光</text><text x="70" y="333" class="body">未经过主光阴影</text><text x="70" y="371" class="mono">B</text>
+<rect x="406" y="164" width="252" height="121" rx="16" fill="#fff" stroke="#d5dbe3"/>
+<text x="431" y="207" class="label">原有光照链</text><text x="431" y="247" class="body">得到受光颜色 L</text>
+<rect x="406" y="362" width="252" height="144" rx="16" fill="#faedf2" stroke="#dca8bd"/>
+<text x="431" y="405" class="label">最低颜色</text><text x="431" y="447" class="mono">B × 0.55</text><text x="431" y="481" class="small">Scale可调；0关闭</text>
+<path d="M307 285H350V224H397" class="line"/><path d="M307 360H350V425H397" class="line"/>
+<rect x="752" y="255" width="214" height="146" rx="16" fill="#e8edf3" stroke="#bcc8d5"/>
+<text x="777" y="301" class="label">逐分量最大值</text><text x="777" y="342" class="mono">max(L,</text><text x="777" y="376" class="mono"> B × 0.55)</text>
+<path d="M658 225H701V296H743" class="line"/><path d="M658 425H701V362H743" class="line"/>
+<rect x="1058" y="255" width="217" height="146" rx="16" fill="#f7dae6" stroke="#dca8bd"/>
+<text x="1083" y="301" class="label">HSV调亮</text><text x="1083" y="343" class="mono">Value 1.8</text><text x="1083" y="379" class="small">输出到眼睛材质</text>
+<path d="M966 325H1049" class="line"/>
+<rect x="1058" y="158" width="217" height="58" rx="12" fill="#fff" stroke="#d5dbe3"/>
+<text x="1080" y="195" class="body">HET → Factor</text><path d="M1165 216V246" class="line"/>
+<text x="790" y="454" class="small">保留受光较亮的结果</text><text x="790" y="485" class="small">暗面也保留虹膜颜色</text>
+<rect x="55" y="553" width="1210" height="164" rx="18" fill="#fff" stroke="#d5dbe3"/>
+<text x="80" y="593" class="label">怎样调：先总亮度，再暗面，再高光</text>
+<text x="80" y="634" class="body">整体过亮 → 降Value；阴影里太亮 → 降Scale；小亮点过强 → 单独降高光</text>
+<text x="80" y="673" class="body">保底使用原色作为基准，保留暗瞳孔与纹样；不是向整个眼睛添加固定白色</text>
+<text x="55" y="763" class="small">0.55为线性着色颜色系数，最终还经过HET与HSV。此控制不会直接提高整场曝光或生成泛光。</text>
+</svg>

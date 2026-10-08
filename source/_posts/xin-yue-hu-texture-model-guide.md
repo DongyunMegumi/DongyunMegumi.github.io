@@ -1,7 +1,7 @@
 ---
 title: 心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南
 date: 2026-10-08 20:00:00
-updated: 2026-10-08 20:00:00
+updated: 2026-10-08 21:12:00
 tags:
   - Blender
   - 角色材质
@@ -9,7 +9,7 @@ tags:
   - UV
 categories:
   - 技術メモ
-description: 以心月狐Blender工程的实际接线为例，说明衣服、脸、头发、眼睛与尾巴的贴图通道，以及法线、UV和描边数据的制作方法。
+description: 以心月狐Blender工程的实际接线为例，说明衣服、脸、头发与尾巴的贴图规范，新增自用模型的眼睛UV适配、高光修正与阴影提亮实操。
 cover: /img/xin-yue-hu-texture-model-guide/00-workflow.png
 toc: true
 ---
@@ -23,8 +23,10 @@ toc: true
 
 本文讲解的是Blender模板。跨引擎移植还需另外核对shader实现、色彩空间、透明与描边流程，不能仅凭图齐全就认定Unity画面已经一致。
 
+**2026年10月8日更新：** [制作9「眼睛适配与提亮实操」](#make-9)已补入这次自用模型的实际操作：头部图集怎样接眼睛模板、专用UV怎样准备、三种高光怎样区分、虹膜发暗怎样排查，以及可以直接调整的参数表。先看这一节，再回查其他部位。
+
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/00-workflow.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/00-workflow.png" alt="从UV与低模基础到贴图、描边和全视图验收的八步制作路线" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/00-workflow.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/00-workflow.png" alt="从UV与低模基础到贴图、描边和全视图验收的八步制作路线" width="1600" height="900" loading="lazy" decoding="async"></a>
 <figcaption>新角色的建议制作顺序（点击图片查看大图）</figcaption>
 </figure>
 
@@ -51,7 +53,7 @@ toc: true
 - [制作 6：RGID：从模型材质分区制作编号图](#make-6)
 - [制作 7：脸D、SDF与Face_HET的制作方法](#make-7)
 - [制作 8：头发D、HM、HN与HR怎样制作](#make-8)
-- [制作 9：眼睛D与Eye_HET](#make-9)
+- [制作 9：眼睛适配与提亮实操](#make-9)
 - [制作 10：Up_FX与尾巴附加图](#make-10)
 - [制作 11：模型法线：四种相关数据怎样区分](#make-11)
 - [制作 12：UV0/UV1/UV2/UV3各自怎样准备](#make-12)
@@ -101,7 +103,7 @@ toc: true
 ### 3. 三套衣服：每套四张，分别怎么做
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" alt="三套服装真实通道" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" alt="三套服装真实通道" width="1728" height="1021" loading="lazy" decoding="async"></a>
 <figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
 </figure>
 
@@ -204,7 +206,7 @@ toc: true
 自己的衣服不需要流动纹样，可以关闭/旁路这一组，从而仍是基础四张。不要仅换D却让内部FX继续读取心月狐的UV图。
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" alt="光角与SDF阈值的关系曲线及RGBA打包要求" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" alt="光角与SDF阈值的关系曲线及RGBA打包要求" width="1600" height="900" loading="lazy" decoding="async"></a>
 <figcaption>根据当前节点计算绘制的说明图（点击图片查看大图）</figcaption>
 </figure>
 
@@ -213,7 +215,7 @@ toc: true
 ### 4. 脸：D、SDF、HET分别负责什么
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" alt="脸和眼睛通道" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" alt="脸和眼睛通道" width="1264" height="730" loading="lazy" decoding="async"></a>
 <figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
 </figure>
 
@@ -261,7 +263,7 @@ Face_HET不是SDF，不能决定鼻影形状。原图白块在其特定UV位置�
 ### 5. 刘海和后发：D、FTM、HM、HN
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" alt="头发通道" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" alt="头发通道" width="1496" height="730" loading="lazy" decoding="async"></a>
 <figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
 </figure>
 
@@ -339,12 +341,14 @@ Bangs的另一个 `Image Texture` 是未接到这条有效高光链的HR节点�
 
 根材质 `Image Texture`=D，`.001`=HET，`.006`=EM资源；`.002`的第二高光旧图没有接入当前主链，不用因它还在节点中就新增一个制作任务。
 
+这是原模板的入口规范。自己的虹膜若放在头部图集的一角，还需要把图集UV与特效UV分开；这次模型的具体适配见[制作9](#make-9)。该节新增的最低亮度节点属于自用材质调整，原模板没有这项控制。
+
 <a id="spec-7"></a>
 
 ### 7. 尾巴：先分清普通表面和体积毛
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" alt="尾巴额外通道" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" alt="尾巴额外通道" width="1496" height="439" loading="lazy" decoding="async"></a>
 <figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
 </figure>
 
@@ -572,7 +576,7 @@ Bangs的另一个 `Image Texture` 是未接到这条有效高光链的HR节点�
 两份HET采样都应对应自己的图。关闭眼透及相关局部调色时可省略；不要把Face_HET与眼睛局部调色的Eye_HET合成一个含义不清的通用文件。
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" alt="HM、HN与HR在头发高光中的分工" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" alt="HM、HN与HR在头发高光中的分工" width="1600" height="900" loading="lazy" decoding="async"></a>
 <figcaption>输入与控制参数的关系示意；并非原贴图作者的绘制过程复原（点击图片查看大图）</figcaption>
 </figure>
 
@@ -624,15 +628,171 @@ R画发片的保留形状与柔边：白实体、黑去掉、灰过渡。刘海�
 
 <a id="make-9"></a>
 
-### 9. 眼睛D与Eye_HET
+### 9. 眼睛适配与提亮实操
 
-把自己的虹膜、瞳孔中心与眼睛UV关系确定清楚。先做颜色D并在模型上看中心、大小与形变，再启用视差和动态高光。眼睛不是随便展UV后仅换一张图就必然与模板一致。
+这一节以这次接入的自用头部为例。眼睛颜色原本在 `Head.png` 的左下角，模型还带独立高光片。最后继续使用原颜色图，补了一张HET和一套专用UV，并调整了独立眼睛材质。**没有重画虹膜，也没有增加整场灯光或修改共享shader源码。**
 
-D里画虹膜分层、瞳孔、眼白和需要固定的细节；动态点高光有专门资源，避免又在D中画很强的大点导致双高光。原图的手绘高光可以作为风格参考，是否保留由目标画面决定。
+如果你只想先使用已经改好的工程，依次看9.1的材质槽、9.7的参数表和9.9的检查顺序；想自己复现，再看中间的UV和节点接线。
 
-Eye_HET只是局部HSV系数：希望受调色的虹膜白，不希望受调色的眼白黑，过渡处灰。原图256²、sRGB，应在当前调色链看过渡，不能拿Face_HET替代。
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/10-eye-first-adaptation.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/10-eye-first-adaptation.png" alt="首次眼睛适配的正面记录，虹膜Value为1，几何高光已修正" width="900" height="902" loading="lazy" decoding="async"></a>
+<figcaption>首次适配记录：颜色图已经对上，几何高光已修正，虹膜亮度Value仍为1。下文继续解决虹膜整体不够亮的问题。</figcaption>
+</figure>
 
-`T_HDMF_EM`视差/高光图集先复用；需新高光形状时再按实际图集结构制作，不把普通颜色图放到这个入口。
+#### 9.1 先找到真正的眼睛面和材质槽
+
+这个模型的对象叫 `eyebrow`，但它同时包含虹膜、眉睫和高光片。对象名不能代替检查实际面。
+
+**在Blender里操作：** 选中该对象，打开「材质属性」，逐个切换材质槽；需要确认分区时，进入编辑模式，取消全选，再使用该槽的「选择」按钮。结束后回到物体模式。只复制、替换对应部位的材质，避免整对象的三个槽都换成虹膜材质。
+
+| 槽 | 这次对应的面 | 最终材质 | 调整职责 |
+|---|---|---|---|
+| 0 | 两只虹膜，共192个面 | Ho_自用眼睛_心月狐 | 颜色、视差、节点高光、阴影最低亮度 |
+| 1 | 眉毛、睫毛等，共938个面 | MI_EYEbrow_01 | 本次保留原材质 |
+| 2 | 眼睛高光片，共200个面 | Ho_自用眼睛_几何高光 | 高光片的颜色、透明度和亮度 |
+
+虹膜使用心月狐眼睛材质的独立副本；高光片也单独复制材质。之后调整自己的角色时，共享的原角色材质仍可保留。
+
+#### 9.2 为什么换了颜色图，还需要适配UV
+
+有两种不同坐标：**图集UV告诉颜色图「眼睛画在哪里」；特效UV告诉视差和点高光「眼睛中心在哪里」。**
+
+这次 `UVMap` 的虹膜范围约为U=0.0197～0.2879、V=0.0057～0.2727，属于头部图集的一小块。模板的点高光、局部视差处理需要与0～1眼睛区域及其中心约定配合。直接让两条支路都用图集角落坐标，高光位置和位移比例就可能不合适。
+
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/08-eye-uv.svg" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/08-eye-uv.svg" alt="头部图集UV与0到1眼睛特效UV分开使用，视差位移缩放回原图集的流程" width="1320" height="860" loading="lazy" decoding="async"></a>
+<figcaption>颜色图留在原图集；眼睛特效用独立坐标。示意图的圆和方框说明坐标关系，不表示真实UV拓扑。</figcaption>
+</figure>
+
+**这次怎样准备：** 检查发现，原有 `UV1` 的虹膜部分已经铺到接近0～1，并能与图集UV建立稳定对应关系。因此复制为 `Ho_EyeUV`，没有重新展开。原 `UVMap`、`EXTRAUV0`、`UV1` 的坐标均保留；活动与渲染UV继续是 `UVMap`。
+
+**自己的模型怎样做：** 在「物体数据属性 → UV贴图」里先检查各层的用途，切到UV编辑器只看虹膜面。如果已有一层合适的眼睛展开，可以复制并明确命名；没有就为虹膜创建专用层，让虹膜中心落在约(0.5,0.5)，检查瞳孔中心、左右眼朝向和棋盘格拉伸，再将眼睛范围安排到0～1。需要左右不同图案时，不要让两只眼睛无条件重叠。
+
+不能见到层名 `UV1` 就直接复制使用。心月狐的衣服等部位把UV1当描边法线编码；别的模型也可能把它用于其他数据。**这里复用的是经检查适合眼睛展开的坐标，不是「UV1总能当眼睛UV」的规则。** 新增层只供眼睛特效读取，眉睫、颜色图和高光片仍按原图集采样。
+
+#### 9.3 视差怎样回到头部颜色图
+
+在着色器编辑器，指定一个「UV贴图」节点读取 `Ho_EyeUV`，送进 `Parallax`；另一个「UV贴图」节点读取 `UVMap`。这次用下式把特效位移转换回颜色图的尺度：
+
+```
+q = 专用眼睛UV
+q_shift = clamp(Parallax(q), 0, 1)
+delta = q_shift - q
+采样Head.png的UV = 原UVMap + delta × (0.270023, 0.270023)
+```
+
+0.270023是这次模型两套坐标的实际对应比例，不是其他模型都该照抄的常量。专用UV上的位移要按图集占用大小缩放，否则会移到脸、耳朵等其他图案。这里的限制范围保护约定的眼睛方形区域；UV岛周围仍应有合适扩边，并转视角检查边缘。
+
+**手动复现的节点顺序：** `Parallax → 矢量运算「最大值」(0) →「最小值」(1) →「减去」专用UV →「相乘」图集比例 →「相加」原UVMap → 颜色纹理Vector`。所有节点放在自己的材质副本里；眼睛高光组的UV入口直接接 `Ho_EyeUV`。
+
+先将 `Parallax / Scale` 设为0，确认眼睛中心与颜色对齐，再逐渐加到这次的0.025。旋转视口看瞳孔位移；如果转动时读到眼睛外的图案，先核对坐标与比例。大尺度视差也可能破坏虹膜边缘，不应靠不断增加Scale来获得亮度。
+
+#### 9.4 HET怎样做，为什么没有另外画一张Eye_D
+
+这次新增 `Head_Eye_HET_Ho.png`，为1024²灰度遮罩：图集中需要调色的虹膜区域白，外围黑，边缘做适量过渡。它与 `Head.png` 使用同一套图集位置，由 `UVMap` 采样。分辨率可以不同，坐标对应必须一致。
+
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/12-eye-het-mask.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/12-eye-het-mask.png" alt="本案例HET遮罩，白色虹膜调色区位于图集左下角，其余为黑色" width="1024" height="1024" loading="lazy" decoding="async"></a>
+<figcaption>本案例真实HET。白块位于左下角是因为眼睛画在这个图集区域；它属于这一套UV，不能直接贴到另一张头上。</figcaption>
+</figure>
+
+**自己绘制：** 导出或显示图集UV作参考，黑底新建一层，在希望调色的虹膜位置画白；瞳孔是否一起调色按目标决定，眼白及其他不希望改变的区域保留黑。把灰度写入RGB，Alpha可保留白。按此模板的眼睛HET入口使用sRGB，再连接到 `Hue/Saturation/Value` 的Factor。灰色表示两种结果混合；Factor不等于灯光强度。
+
+当Hue=0.5、Saturation=1、Value=1时，即使HET是白也不会自动提亮。白色只是允许这一片采用调色后的结果。Face_HET用于眼透控制，不能拿它代替眼睛局部调色遮罩。
+
+原 `Head.png` 的虹膜颜色和中心已适合这个模型，处理采样与材质后可以继续使用。**需要单独Eye_D的情况：** 原图分辨率不足、虹膜设计要重画、图集边缘难留扩边，或希望以后独立更换眼睛。
+
+要拆成独立图，可以复制原文件并按目标眼睛UV重新输出虹膜区域，让独立Eye_D与0～1专用UV对应，再修改其颜色采样接线。单纯裁出一个方块并不能保证原模型坐标正确；本案例的两套UV已经有对应关系，其他模型要重新核对。最后记录颜色图、HET、专用UV各使用哪套坐标。
+
+#### 9.5 先分清三种高光，才知道该调哪里
+
+| 高光来源 | 你在哪里找 | 会怎样变化 | 制作与调整方法 |
+|---|---|---|---|
+| 画在D里的亮斑 | 打开颜色图就能看到 | 随表面与纹理采样，图案本身固定 | 在绘画源文件调形状与颜色；固定大亮斑要为其他高光留余量 |
+| 节点生成的高光 | 虹膜材质的「眼睛高光」组 | 受特效UV、视差、参数和时间接线影响 | 调细节/点高光强度、大小、位移；EM资源继续提供素材 |
+| 模型上的高光片 | 编辑模式选择材质槽2的面 | 随几何遮挡和自己的材质受光变化 | 调高光片材质，必要时再改几何位置和形状 |
+
+这次颜色图已经画有高光，模型也有高光片，因此另外一套节点高光使用适中的强度。发现双重亮点时，可以暂将节点的细节与点高光强度设为0：仍然可见的亮点继续从D或高光片里找。
+
+`T_HDMF_EM.png`继续复用模板资源，它提供视差/高光素材。把自己的Eye_D放进这个入口，并不能让模板自动从普通虹膜绘画里得到正确高度。做新的特效素材前，应先弄清闭包里各通道和各采样区域的用途。
+
+#### 9.6 高光片发灰：这次具体改了什么
+
+本模型原 `MI_HighLight_01` 使用原理化BSDF，金属度=1、粗糙度=1。对这块想持续显示亮色的小高光片，原设置让它在某些视角显得发灰。金属度和粗糙度不是通用的「眼睛更亮」开关。
+
+这次复制成 `Ho_自用眼睛_几何高光`，保留颜色图、UV、Alpha和原有透明设置；颜色图Color改接 `Emission Color`，`Emission Strength`为1，基础色改黑、金属度改0、Specular IOR Level改0。这样由贴图颜色控制高光片的亮色，减少它被普通受光结果压暗的情况。
+
+**你操作的位置：** 切换到槽2的独立材质，在着色器编辑器找到原理化BSDF及图像纹理，核对上述连接与参数。想弱一点，降低Emission Strength；想改变形状，在高光片几何或其颜色/透明图上调整。此做法用于风格化高光片，普通虹膜和眉睫仍用各自材质。Alpha有连线还需要与该材质的透明设置配合，新材质不能只连Alpha就假定透明已经正确。
+
+#### 9.7 虹膜不亮：这次增加的最低亮度
+
+第一次适配时，为了保留原图颜色，将模板HSV的Value从2降到1，同时保留了模板较暗的阴影设置。颜色已经接对，阴影仍会压暗虹膜；只把白色高光点加亮，也不能改善虹膜整体颜色。
+
+后来把Value设为1.8，细节高光从0.10调至0.22、点高光从0.20调至0.40，并新增一个名为「眼睛提亮：阴影保底与总亮度」的节点框。这是独立眼睛材质的新增功能，可手动用两枚矢量运算节点复现。
+
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/09-eye-brightness.svg" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/09-eye-brightness.svg" alt="原色带高光乘最低亮度系数，与光照后颜色逐分量取最大值，再由HET控制HSV提亮" width="1320" height="810" loading="lazy" decoding="async"></a>
+<figcaption>保留光照结果，同时为虹膜设置可调的颜色下限。HET继续决定哪些位置接受HSV调色。</figcaption>
+</figure>
+
+```
+最低颜色 = 带节点高光的原色 × 0.55
+保底结果 = max(光照后颜色, 最低颜色)
+最终颜色 = 用HET作Factor的HSV调色(保底结果，Value=1.8)
+```
+
+这里的max按RGB三个分量分别比较。0.55是线性着色颜色的系数，不是「屏幕亮度55%」。HET白色区域在Value=1.8时，最低颜色也继续乘亮度倍率；灰色区域只混合部分调色效果。用带颜色的原色作下限，能保留暗瞳孔和虹膜纹样，比给整只眼睛添加固定白色更容易控制。
+
+**手动接线：** 从「眼睛高光」组输出分一条线，接矢量运算「缩放」，Scale填0.55；原「多光源合成」输出和这个缩放结果，分别接另一枚矢量运算「最大值」的两个Vector；最大值输出接 `Hue/Saturation/Value / Color`。原HET接Factor、HSV输出接材质输出的关系继续保留。原有光照和共享高光组内部无需修改。
+
+最低亮度是一项风格化颜色修正。它让阴影里的眼睛更清楚，不会直接提高整场曝光、照亮周围物体或自动生成泛光。想要眼睛周围的光晕，需要另查工程的后期流程。
+
+<a id="eye-controls"></a>
+
+**已经改好的工程：** 选 `eyebrow` → 材质槽0 → 着色器编辑器。当前控制如下。
+
+| 调整入口 | 当前值 | 调大后看到什么 | 建议先怎样试 |
+|---|---:|---|---|
+| Hue/Saturation/Value / Value | 1.8 | HET允许区域更亮，过大可能丢失虹膜细节 | 太亮先降至1.5～1.6 |
+| 矢量运算.005 / Scale | 0.55 | 阴影中的最低颜色更亮 | 阴影里太亮降至0.35；0关闭保底 |
+| Group.002 / 细节高光强度 | 0.22 | 模板细节高光更明显 | 从0开始增加，检查与手绘亮斑是否叠加过强 |
+| Group.002 / 点高光强度 | 0.40 | 模板点高光更明显 | 暂设0可区分其他高光来源 |
+| Group.002 / 点高光大小 | 0.035 | 改变模板点高光的尺寸 | 先固定强度，再小幅调尺寸 |
+| Group.002 / 点高光位移 | X=0.19，Y=-0.14 | 改变模板点高光的位置 | 转视角确认高光仍在虹膜合适位置 |
+| Parallax / Scale | 0.025 | 虹膜纹理的视差位移更强 | 先0确认UV，再逐步增加 |
+| 槽2的原理化BSDF / Emission Strength | 1 | 几何高光片更亮 | 单独调它，不影响虹膜整体亮度 |
+
+节点名属于这份生成的材质；自己搭建时编号可能不同，以节点类型、所在框和实际接线识别。点高光旋转仍由时间接线控制，静止画面也要核对当前帧。
+
+#### 9.8 给自己的新眼睛图怎样绘制
+
+1. **先做灰度结构。** 确定瞳孔中心、虹膜边缘、上深下浅的层次；放到模型上检查大小与变形，再细化。画死的阴影越强，之后用灯光和最低亮度能调整的余量越少。
+2. **再做虹膜颜色。** 分开保存主体色、放射纹、内圈与外圈等绘画层。先让瞳孔与虹膜可辨，再增加细节；不用一开始把白色大高光画满。
+3. **决定固定与动态高光的分工。** 保留哪些手绘亮斑、哪些交给节点、是否使用模型高光片，先选清楚。三套都很强会让眼睛下半部或亮点过曝。
+4. **制作独立HET。** 对应颜色图坐标画允许调色区；想保持眼白、某些图案或瞳孔颜色时，将这些区域排除。无需为同一功能再画一张没有接线的遮罩。
+5. **整理边缘和扩边。** 确认过滤、缩小和小幅视差时，边缘不会读到图集里其他部位。检查UV、特效图和眼球曲面法线；不要让极小或退化UV面承担主要视差方向。
+
+本案例没有新增虹膜法线图，继续使用模板的法线输入设置和网格已有法线。颜色图、HET、特效UV以及模板EM资源职责不同，补一张图前先确认要补的是哪种数据。
+
+#### 9.9 每次接新眼睛，按这个顺序检查
+
+| 看到的问题 | 先检查 | 修改后怎样确认 |
+|---|---|---|
+| 眼睛读到脸或耳朵图案 | 图集UV、显式UV层引用和图片Vector | 视差Scale=0先看对齐，再旋转视口 |
+| 眼睛中心对，但动态高光偏到旁边 | 专用UV中心、方向、点高光位移 | 暂减其他高光，再看正面及左右斜视 |
+| 只有小亮点，虹膜整体发暗 | HSV Value、HET范围、主光阴影与最低亮度 | 保持同一灯光和曝光，分别调总亮度与阴影下限 |
+| 高光片发灰 | 选槽2确认几何范围，检查金属度、粗糙度和颜色/发光连接 | 单独比较高光片，正面和侧面都看 |
+| 虹膜过白，瞳孔或纹样看不清 | HSV、最低亮度、三类高光叠加 | 降总亮度，再逐个恢复高光来源 |
+| 转头时有接缝或明显拉伸 | UV方向与拉伸、扩边、视差Scale和曲面法线 | 正面、左右侧面、靠近与远离分别检查 |
+
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/11-eye-brightened-side.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/11-eye-brightened-side.png" alt="虹膜提亮后的35度斜侧渲染视口记录，阴影区域仍保留粉红虹膜和高光" width="900" height="572" loading="lazy" decoding="async"></a>
+<figcaption>提亮后的35°斜侧视口记录。与本节开头的首次适配图采用不同视角和灯光状态，两图用于记录阶段效果，不是严格的同条件A/B亮度对照。已检查正面与斜侧视口；截图不代表最终相机渲染。</figcaption>
+</figure>
+
+这次可以归纳成四项可复用的操作：**复制独立材质 → 为眼睛特效准备合适UV → 分别调整虹膜和高光片 → 转视角验证后记录参数。** 已有足够的颜色图时，先检查采样和光照；需要独立Eye_D时，再按目标UV输出或重画。
+
+操作前保留原材质、网格UV和可编辑绘画文件。新增UV、材质副本和打包图片只有随工程保存才会长期保留；这次调整时没有自动保存或覆盖原 `.blend`。
 
 <a id="make-10"></a>
 
@@ -659,7 +819,7 @@ Tail_RGID按尾巴分支需要编号，原常见1/4等低灰度，解码位置�
 普通尾巴入门先处理D/必要透明；体积毛另需几何和属性，不能仅凭图数判断已完整设置。
 
 <figure>
-<a href="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" alt="表面法线、描边方向与UV0至UV3的用途" loading="lazy" decoding="async"></a>
+<a href="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" alt="表面法线、描边方向与UV0至UV3的用途" width="1600" height="1000" loading="lazy" decoding="async"></a>
 <figcaption>依据当前接线说明模型数据；UV1是方向编码（点击图片查看大图）</figcaption>
 </figure>
 

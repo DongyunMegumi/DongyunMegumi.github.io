@@ -23,6 +23,10 @@ try {
     table.replaceWith(region);
     region.append(table);
   }
+  const anchor = document.getElementById(location.hash.slice(1));
+  if (anchor && body.contains(anchor)) {
+    requestAnimationFrame(() => anchor.scrollIntoView({ block: "start" }));
+  }
 } catch {
   title.textContent = "这篇手记暂时无法读取";
   body.textContent = "请返回首页，或稍后重试。";
