@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="東雲Megumi 的角色作品集，角色立绘、模型渲染与制作记录。">
+  <title>Characters | 東雲Megumi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Forum&family=Shippori+Mincho+B1&family=Zen+Kaku+Gothic+Antique:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="showcase.css">
+  <link rel="stylesheet" href="character-cards.css">
+  <script src="assets/vendor/lucide.min.js" defer></script>
+  <script src="character-cards.js" defer></script>
+  <script src="showcase.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#overviewTitle">跳转到角色总览</a>
+  <header class="site-tools">
+    <button class="menu-button" id="openMenu" aria-label="Open menu" title="菜单" aria-haspopup="dialog"><i data-lucide="menu"></i></button>
+    <a class="blog-link" href="/">東雲 Megumi</a>
+  </header>
+  <main>
+    <section class="character-overview" aria-labelledby="overviewTitle">
+      <div class="overview-orbit" aria-hidden="true"></div>
+      <div class="overview-lines" aria-hidden="true"></div>
+      <div class="overview-header">
+        <h1 id="overviewTitle">Characters</h1>
+        <p>Portfolio</p>
+      </div>
+      <nav id="overviewCharacters" class="overview-characters portrait-rail" aria-label="角色总览"></nav>
+    </section>
+    <section class="character-stage" id="profile" aria-label="Character showcase" tabindex="-1">
+      <img class="circle-decoration" src="assets/reference/circle_01.png" alt="">
+      <div class="composition">
+        <img class="diamond-background" src="assets/reference/chara_bg.png" alt="">
+        <div class="artwork" id="artwork"><img id="mainArtwork" src="assets/images/char-01.png" alt="キャラクター01" fetchpriority="high"></div>
+        <article class="profile" aria-labelledby="characterName">
+          <div class="profile-top">
+            <p class="character-quote" id="characterQuote"></p>
+            <h2 class="character-name" id="characterName">CHARACTER 01</h2>
+            <p class="character-ruby" id="characterRuby">キャラクター01</p>
+          </div>
+          <p class="credit-band" id="characterCredit">東雲 Megumi</p>
+          <div class="profile-body">
+            <p class="description" id="characterDescription"></p>
+            <p class="design-note" id="characterStory"></p>
+            <div class="media" id="media">
+              <div class="media-tabs" id="mediaTabs" role="tablist" aria-label="作品类型"></div>
+              <div id="mediaPanel" role="tabpanel">
+                <button class="media-image" id="openMedia" aria-label="Enlarge gallery image" title="放大图片">
+                  <img id="mediaImage" src="assets/images/char-01.png" alt="角色作品">
+                  <span class="media-enlarge"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="media-pagination" id="mediaPagination" aria-label="作品图片"></div>
+              </div>
+            </div>
+            <details class="technical" id="technical">
+              <summary>Model details <i data-lucide="plus"></i></summary>
+              <dl id="technicalData"></dl><p class="tags" id="characterTags"></p>
+            </details>
+          </div>
+          <img class="profile-decoration" src="assets/reference/chara_base-text-deco.png" alt="">
+        </article>
+      </div>
+      <div class="artwork-tools">
+        <button class="round-tool" id="toggleFraming" aria-label="Show full artwork" aria-pressed="false" title="全身 / 特写"><i data-lucide="minimize"></i></button>
+        <button class="round-tool secondary-tool" id="enlargeArtwork" aria-label="Enlarge artwork" title="放大立绘"><i data-lucide="expand"></i></button>
+      </div>
+      <button class="character-arrow previous" id="previousCharacter" aria-label="Previous character" title="上一个角色"><i data-lucide="chevron-left"></i></button>
+      <button class="character-arrow next" id="nextCharacter" aria-label="Next character" title="下一个角色"><i data-lucide="chevron-right"></i></button>
+    </section>
+    <section class="character-selection character-band" aria-labelledby="selectionTitle">
+      <div class="character-band-orbit" aria-hidden="true"></div>
+      <div class="character-band-heading">
+        <h2 id="selectionTitle">Characters</h2>
+        <a href="#overviewTitle">All characters</a>
+      </div>
+      <nav id="characterSelector" class="character-selector portrait-rail" aria-label="选择角色"></nav>
+      <p class="selection-counter" id="selectionCounter" aria-live="polite">01 / 03</p>
+    </section>
+  </main>
+  <footer class="showcase-footer">
+    <a class="artist-signature" href="/">東雲<span>Megumi</span></a>
+    <nav aria-label="站点链接"><a href="/">Blog</a><a href="/about/">About</a><a href="https://vgen.co/DongyunMegumi" target="_blank" rel="noopener">Commission</a><a href="https://x.com/DongyunMegumi" target="_blank" rel="noopener">X / Twitter</a></nav>
+    <small>&copy; 2026 東雲Megumi</small>
+  </footer>
+  <dialog class="navigation-dialog" id="navigationDialog" aria-label="菜单">
+    <button class="dialog-close" data-close="navigationDialog" aria-label="Close menu" title="关闭菜单"><i data-lucide="x"></i></button>
+    <p class="menu-brand">東雲 Megumi</p>
+    <nav><a href="/">Blog</a><a href="#overviewTitle">Characters</a><a href="/about/">About</a><a href="https://vgen.co/DongyunMegumi" target="_blank" rel="noopener">Commission</a></nav>
+  </dialog>
+  <dialog class="image-dialog" id="imageDialog" aria-label="图片预览">
+    <button class="dialog-close" data-close="imageDialog" aria-label="Close image" title="关闭图片"><i data-lucide="x"></i></button>
+    <button class="image-previous" id="imagePrevious" aria-label="Previous image" title="上一张"><i data-lucide="chevron-left"></i></button>
+    <img id="dialogImage" alt="">
+    <button class="image-next" id="imageNext" aria-label="Next image" title="下一张"><i data-lucide="chevron-right"></i></button>
+    <p id="imageCounter"></p>
+  </dialog>
+  <p class="load-status" id="loadStatus" role="status" hidden></p>
+</body>
+</html>

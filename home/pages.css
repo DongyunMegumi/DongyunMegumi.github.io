@@ -1,0 +1,247 @@
+.detail-page {
+  --paper: #454b55;
+  --ink: #f4f4f4;
+  --muted: #76808d;
+  --rule: #cdd2db;
+  --pink: #915e72;
+  background: var(--ink);
+  color: var(--paper);
+}
+.page-header {
+  position: relative;
+  height: 88px;
+  padding-inline: 76px;
+  border: 0;
+}
+.page-header .brand-image {
+  width: 180px;
+}
+.page-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  font: 300 14px var(--latin);
+}
+.page-header nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.page-header [aria-current] {
+  color: #915e72;
+}
+.page-main {
+  max-width: 1280px;
+  margin: auto;
+  padding: 45px 76px 100px;
+  min-height: calc(100svh - 170px);
+}
+.page-main .breadcrumb {
+  display: flex;
+  gap: 15px;
+  font-size: 11px;
+  color: #76808d;
+}
+.page-main h1 {
+  font: 300 97px/1 var(--latin);
+  color: #8f97a2;
+  margin: 45px 0 18px;
+}
+.page-subtitle {
+  font-size: 12px;
+  color: #76808d;
+  margin-bottom: 55px;
+}
+.news-entry {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 20px;
+  gap: 20px;
+  padding: 32px 0;
+  border-top: 1px solid #cdd2db;
+  align-items: center;
+}
+.news-entry time {
+  font: 300 14px var(--latin);
+  color: #76808d;
+}
+.news-entry h2 {
+  font: 400 16px/1.8 var(--sans);
+}
+.news-entry p {
+  font-size: 12px;
+  color: #76808d;
+  margin-top: 6px;
+}
+.news-entry:hover {
+  color: #915e72;
+}
+.profile-layout {
+  display: grid;
+  grid-template-columns: 315px minmax(0, 1fr);
+  gap: 60px;
+  align-items: start;
+}
+.profile-image {
+  width: 315px;
+  height: 395px;
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+.profile-copy h2 {
+  font: 400 28px/1.5 var(--sans);
+}
+.profile-copy h2 span {
+  font: 300 26px var(--latin);
+  margin-left: 18px;
+}
+.profile-copy p {
+  font-size: 14px;
+  line-height: 2.2;
+  margin-top: 25px;
+}
+.profile-copy dl {
+  margin: 30px 0;
+}
+.profile-copy dl > div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 20px;
+  font-size: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid #cdd2db;
+}
+.profile-copy dt {
+  color: #76808d;
+}
+.profile-copy dd {
+  margin: 0;
+}
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  font-size: 12px;
+}
+.archive-grid {
+  display: grid;
+  grid-template-columns: 315px minmax(0, 1fr);
+  gap: 60px;
+}
+.archive-render {
+  height: 395px;
+  width: 100%;
+  object-fit: contain;
+  background: #e4e6e9;
+}
+.archive-copy h2 {
+  font: 400 27px/1.5 var(--sans);
+  margin-bottom: 20px;
+}
+.archive-copy p {
+  font-size: 13px;
+  line-height: 2;
+  color: #76808d;
+  margin-bottom: 30px;
+}
+.archive-notes {
+  margin-top: 60px;
+}
+.page-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 25px;
+  padding: 35px 76px;
+  background: #ecedef;
+  color: #76808d;
+  font: 300 11px var(--latin);
+}
+.page-footer a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+@media (max-width: 1000px) {
+  .page-header {
+    padding-inline: 35px;
+  }
+  .page-main {
+    padding-inline: 35px;
+  }
+  .page-header nav {
+    gap: 20px;
+    font-size: 12px;
+  }
+  .page-main h1 {
+    font-size: 76px;
+  }
+  .profile-layout,
+  .archive-grid {
+    gap: 35px;
+    grid-template-columns: 270px minmax(0, 1fr);
+  }
+  .profile-image {
+    width: 270px;
+  }
+}
+@media (max-width: 760px) {
+  .page-header {
+    height: auto;
+    padding: 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .page-header .brand-image {
+    width: 155px;
+  }
+  .page-header nav {
+    font-size: 12px;
+    gap: 20px;
+  }
+  .page-main {
+    padding: 30px 20px 65px;
+  }
+  .page-main h1 {
+    font-size: 60px;
+    margin-top: 35px;
+  }
+  .page-subtitle {
+    margin-bottom: 35px;
+  }
+  .news-entry {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    gap: 10px;
+    padding: 25px 0;
+  }
+  .news-entry time,
+  .news-entry > div {
+    grid-column: 1;
+  }
+  .news-entry > svg {
+    grid-column: 2;
+    grid-row: 1/3;
+  }
+  .news-entry h2 {
+    font-size: 14px;
+  }
+  .profile-layout,
+  .archive-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .profile-image {
+    width: min(100%, 315px);
+  }
+  .profile-copy h2 {
+    font-size: 25px;
+  }
+  .profile-copy p {
+    font-size: 13px;
+  }
+  .page-footer {
+    padding: 30px 20px;
+  }
+  .page-main h1 {
+    overflow-wrap: anywhere;
+  }
+}

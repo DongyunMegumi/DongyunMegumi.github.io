@@ -1,0 +1,1278 @@
+<!DOCTYPE html><html lang="ja" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南 | Dongyun Megumi</title><meta name="author" content="Dongyun Megumi"><meta name="copyright" content="Dongyun Megumi"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f4efe6"><meta name="description" content="以心月狐Blender工程的实际接线为例，说明衣服、脸、头发与尾巴的贴图规范，新增自用模型的眼睛UV适配、高光修正与阴影提亮实操。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南">
+<meta property="og:url" content="https://dongyunmegumi.github.io/2026/10/xin-yue-hu-texture-model-guide/index.html">
+<meta property="og:site_name" content="Dongyun Megumi">
+<meta property="og:description" content="以心月狐Blender工程的实际接线为例，说明衣服、脸、头发与尾巴的贴图规范，新增自用模型的眼睛UV适配、高光修正与阴影提亮实操。">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:image" content="https://dongyunmegumi.github.io/img/xin-yue-hu-texture-model-guide/00-workflow.png">
+<meta property="article:published_time" content="2026-10-08T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-08T13:12:00.000Z">
+<meta property="article:author" content="Dongyun Megumi">
+<meta property="article:tag" content="Blender">
+<meta property="article:tag" content="SDF">
+<meta property="article:tag" content="UV">
+<meta property="article:tag" content="角色材质">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dongyunmegumi.github.io/img/xin-yue-hu-texture-model-guide/00-workflow.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南",
+  "url": "https://dongyunmegumi.github.io/2026/10/xin-yue-hu-texture-model-guide/",
+  "image": "https://dongyunmegumi.github.io/img/xin-yue-hu-texture-model-guide/00-workflow.png",
+  "datePublished": "2026-10-08T12:00:00.000Z",
+  "dateModified": "2026-10-08T13:12:00.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Dongyun Megumi",
+      "url": "https://dongyunmegumi.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://dongyunmegumi.github.io/2026/10/xin-yue-hu-texture-model-guide/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//fonts.googleapis.com" crossorigin=""/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f4efe6')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f4efe6')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&amp;family=Zen+Maru+Gothic:wght@400;500;700&amp;family=Patrick+Hand&amp;display=swap" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: 'コピー成功',
+    error: 'コピー失敗',
+    noSupport: 'ブラウザが対応していません'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: 'たった今',
+    min: '分前',
+    hour: '時間前',
+    day: '日前',
+    month: 'ヶ月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: 'もっと見る'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@400;500;700&family=Patrick+Hand&display=swap" rel="stylesheet"><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="/characters/character-cards.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Forum&display=swap"><script>document.documentElement.setAttribute('data-theme','light');try{localStorage.setItem('theme','light')}catch(e){}</script><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-color: #f4efe6;"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">記事</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">タグ</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">カテゴリ</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> ホーム</span></a></div><div class="menus_item"><a class="site-page" href="/characters/"><i class="fa-fw fas fa-dragon"></i><span> キャラ</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> アーカイブ</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> タグ</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Dongyun Megumi</span></a><a class="nav-page-title" href="/"><span class="site-name">心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  ホームに戻る</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> ホーム</span></a></div><div class="menus_item"><a class="site-page" href="/characters/"><i class="fa-fw fas fa-dragon"></i><span> キャラ</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> アーカイブ</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> タグ</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">作成日</span><time class="post-meta-date-created" datetime="2026-10-08T12:00:00.000Z" title="作成日 2026-10-08 20:00:00">2026-10-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新日</span><time class="post-meta-date-updated" datetime="2026-10-08T13:12:00.000Z" title="更新日 2026-10-08 21:12:00">2026-10-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%80%E8%A1%93%E3%83%A1%E3%83%A2/">技術メモ</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">閲覧数:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>想让自己的角色使用心月狐这套Blender渲染模板，需要同时准备贴图和模型数据。只换颜色图可以看到基础效果；要让脸影、头发高光、透明与描边按预期工作，还要知道每个入口实际读取什么。</p>
+<p>这篇文章以《心月狐打包.blend》的有效接线、原纹理通道和模型数据为案例，分成“入口规范”和“制作方法”两部分。检查基准为2026年10月8日；这是该模板的使用说明，不能当作游戏官方通用资产规范。原图数值、节点计算与建议起步值分别说明。</p>
+<p><strong>先记住最常用的组合：衣服D &#x2F; N &#x2F; FTM &#x2F; RGID，脸D &#x2F; SDF &#x2F; HET，头发D &#x2F; FTM &#x2F; HM &#x2F; HN，眼睛D &#x2F; HET。</strong> 一套最终PNG往往由多份独立源图打包而成，Alpha、UV1和顶点色也可能装的是控制数据。</p>
+<p>本文讲解的是Blender模板。跨引擎移植还需另外核对shader实现、色彩空间、透明与描边流程，不能仅凭图齐全就认定Unity画面已经一致。</p>
+<p><strong>2026年10月8日更新：</strong> <a href="#make-9">制作9「眼睛适配与提亮实操」</a>已补入这次自用模型的实际操作：头部图集怎样接眼睛模板、专用UV怎样准备、三种高光怎样区分、虹膜发暗怎样排查，以及可以直接调整的参数表。先看这一节，再回查其他部位。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/00-workflow.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/00-workflow.png" alt="从UV与低模基础到贴图、描边和全视图验收的八步制作路线" width="1600" height="900" loading="lazy" decoding="async"></a>
+<figcaption>新角色的建议制作顺序（点击图片查看大图）</figcaption>
+</figure>
+
+<span id="more"></span>
+
+<details class="article-toc" open>
+<summary>阅读目录：按部位查规范，按工序学制作</summary>
+
+<ul>
+<li><a href="#spec-1">规范 1：按心月狐的组织方式，到底有几张</a></li>
+<li><a href="#spec-2">规范 2：先给模型分材质、整理UV</a></li>
+<li><a href="#spec-3">规范 3：三套衣服：每套四张，分别怎么做</a></li>
+<li><a href="#spec-4">规范 4：脸：D、SDF、HET分别负责什么</a></li>
+<li><a href="#spec-5">规范 5：刘海和后发：D、FTM、HM、HN</a></li>
+<li><a href="#spec-6">规范 6：眼睛：D、HET，以及可复用的高光资源</a></li>
+<li><a href="#spec-7">规范 7：尾巴：先分清普通表面和体积毛</a></li>
+<li><a href="#spec-8">规范 8：身体、眉睫、描边与灯光</a></li>
+<li><a href="#spec-9">规范 9：导出与接入的一次完整流程</a></li>
+<li><a href="#spec-10">规范 10：验收时逐项看什么</a></li>
+<li><a href="#make-1">制作 1：先准备哪些工作文件</a></li>
+<li><a href="#make-2">制作 2：正确的制作先后顺序</a></li>
+<li><a href="#make-3">制作 3：衣服D：怎样画固有色和闭塞</a></li>
+<li><a href="#make-4">制作 4：衣服N：法线和粗糙度怎样做</a></li>
+<li><a href="#make-5">制作 5：衣服FTM：三张工作遮罩合成一张</a></li>
+<li><a href="#make-6">制作 6：RGID：从模型材质分区制作编号图</a></li>
+<li><a href="#make-7">制作 7：脸D、SDF与Face_HET的制作方法</a></li>
+<li><a href="#make-8">制作 8：头发D、HM、HN与HR怎样制作</a></li>
+<li><a href="#make-9">制作 9：眼睛适配与提亮实操</a></li>
+<li><a href="#make-10">制作 10：Up_FX与尾巴附加图</a></li>
+<li><a href="#make-11">制作 11：模型法线：四种相关数据怎样区分</a></li>
+<li><a href="#make-12">制作 12：UV0&#x2F;UV1&#x2F;UV2&#x2F;UV3各自怎样准备</a></li>
+<li><a href="#make-13">制作 13：COL0、透明修正、ID、毛层属性怎样做</a></li>
+<li><a href="#make-14">制作 14：给自己新角色的一次练习任务</a></li>
+</ul>
+</details>
+
+<h2 id="第一部分：原工程怎样读取你的数据"><a href="#第一部分：原工程怎样读取你的数据" class="headerlink" title="第一部分：原工程怎样读取你的数据"></a>第一部分：原工程怎样读取你的数据</h2><p><a id="spec-1"></a></p>
+<h3 id="1-按心月狐的组织方式，到底有几张"><a href="#1-按心月狐的组织方式，到底有几张" class="headerlink" title="1. 按心月狐的组织方式，到底有几张"></a>1. 按心月狐的组织方式，到底有几张</h3><p>文件名统一省略 <code>T_R2T1XinMd10011</code> 前缀。1K&#x3D;1024、2K&#x3D;2048，以下尺寸都来自原图。</p>
+<table>
+<thead>
+<tr>
+<th>部位&#x2F;图集</th>
+<th>自己角色对应的文件</th>
+<th>原图尺寸</th>
+<th align="right">数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cloth 服装图集</td>
+<td>Cloth_D、Cloth_N、Cloth_FTM、Cloth_RGID</td>
+<td>均2K</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>Up 上身图集，包括其UV里的皮肤</td>
+<td>Up_D、Up_N、Up_FTM、Up_RGID</td>
+<td>均2K</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>Down 下身图集，包括其UV里的皮肤</td>
+<td>Down_D、Down_N、Down_FTM、Down_RGID</td>
+<td>均2K</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>Bangs 刘海图集</td>
+<td>Bangs_D、Bangs_FTM、Bangs_HM、Bangs_HN</td>
+<td>2K、512、2K、256</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>Hair 后发图集</td>
+<td>Hair_D、Hair_FTM、Hair_HM、Hair_HN</td>
+<td>2K、512、2K、256</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>Face 脸</td>
+<td>Face_D、Face_HET、适配脸UV的SDF</td>
+<td>2K、256、原SDF为1K</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>Eye 眼睛</td>
+<td>Eye_D、Eye_HET</td>
+<td>2K、256</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>Up 特效，可选</td>
+<td>Up_FX</td>
+<td>2K</td>
+<td align="right">+1</td>
+</tr>
+<tr>
+<td>Tail 尾巴完整原槽位，可选</td>
+<td>Tail_D、Tail_N、Tail_RGID、Tail_ID、角色_M</td>
+<td>1K、1K、1K、512、2K</td>
+<td align="right">+5</td>
+</tr>
+</tbody></table>
+<p>前三套衣服12张、前后发8张、脸3张、眼睛2张，合计25张。当前Up内部接着 <code>心月狐UP_FX</code>，保留流动发光就是26张；再照原尾巴的五个角色相关槽位准备，是31张的参考清单。尾巴N等槽位存在不代表每个输出当前都参与可见效果，详见第7部分。</p>
+<p>这不是必须达到的数量。前后发共用同一张图集可以只做一套4张；三套服装合并图集也可减少数量；关闭眼透&#x2F;局部调色可以省HET；没有空间变化的透明控制可以用常量代替FTM。</p>
+<p>计数不包括能复用的HR高光色带、Matcap、眼睛高光图集、毛纹高度图、Flow扰动图和环境HDR。原脸FTM虽留在节点里，其输出未用于脸的主效果，未列入必做清单。图片名里的 <code>.001</code> 常是同一素材的Blender数据副本，也不是必须再画一张。</p>
+<p><a id="spec-2"></a></p>
+<h3 id="2-先给模型分材质、整理UV"><a href="#2-先给模型分材质、整理UV" class="headerlink" title="2. 先给模型分材质、整理UV"></a>2. 先给模型分材质、整理UV</h3><p>心月狐有对应 <code>MI_R2T1XinMd10011Cloth/Up/Down/Bangs/Hair/Face/Eye/Tail</code> 的材质。Cloth&#x2F;Up&#x2F;Down是图集与材质的划分，不能仅凭名字判断它只包含布料；原Up、Down颜色图中也有身体皮肤。</p>
+<p>你的模型可以沿用这个分组：脸、眼球、刘海、后发、上身、下身、其他服装。要共用一张图集的网格必须在同一套UV约定下取图。每套D、N、FTM、RGID或D、HM、HN虽然分辨率不同，UV岛位置必须一致。</p>
+<p>颜色与控制图都按自己的UV做。原心月狐的图只能参考画法，不能直接匹配另一张头或另一套衣服UV。把原模板复制给自己后，逐个替换角色相关图片；未换的入口仍会读旧角色的图。</p>
+<p><a id="spec-3"></a></p>
+<h3 id="3-三套衣服：每套四张，分别怎么做"><a href="#3-三套衣服：每套四张，分别怎么做" class="headerlink" title="3. 三套衣服：每套四张，分别怎么做"></a>3. 三套衣服：每套四张，分别怎么做</h3><figure>
+<a href="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/01-clothing-channels.png" alt="三套服装真实通道" width="1728" height="1021" loading="lazy" decoding="async"></a>
+<figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
+</figure>
+
+<h4 id="3-1-D：RGB颜色，Alpha闭塞-发光"><a href="#3-1-D：RGB颜色，Alpha闭塞-发光" class="headerlink" title="3.1 D：RGB颜色，Alpha闭塞&#x2F;发光"></a>3.1 D：RGB颜色，Alpha闭塞&#x2F;发光</h4><p><strong>原案例：</strong> <code>T_R2T1XinMd10011Cloth_D.png</code>。RGB有红布、浅色毛饰、金色装饰的固有色与纹样；Alpha常见中性值是102&#x2F;255≈0.4，部分区域接近0。Up、Down、脸、前后发的D也常用102作中性值。这来自原图采样，不表示所有像素都必须102。</p>
+<p><strong>你制作：</strong> RGB画颜色、妆纹、布纹和必要的手绘细节；不要把固定方向的大面积受光、投影和镜面亮斑全画死。Alpha单独保存为控制通道，它不是这一套衣服的透明度。</p>
+<p>当前组 <code>鸣潮贴图转换</code> 的计算是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">闭塞输出 = clamp((A - 0.02) / 0.23, 0, 1)</span><br><span class="line">发光输出 = clamp((A - 0.50) / 0.50, 0, 1)</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="right">Alpha的8bit值</th>
+<th>当前意义</th>
+<th>制作建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0～5</td>
+<td>闭塞接近最强，发光为0</td>
+<td>真正想压暗的缝隙、小范围遮挡</td>
+</tr>
+<tr>
+<td align="right">约35</td>
+<td>闭塞输出约0.51</td>
+<td>中等闭塞起点，按画面调整</td>
+</tr>
+<tr>
+<td align="right">64～127</td>
+<td>闭塞已满值，发光为0</td>
+<td>无闭塞、无发光区域；照原图可用102</td>
+</tr>
+<tr>
+<td align="right">约191</td>
+<td>闭塞满值、发光约0.50</td>
+<td>需要发光的装饰</td>
+</tr>
+<tr>
+<td align="right">255</td>
+<td>闭塞满值、发光控制满值</td>
+<td>不要整张普通衣服无意导成255</td>
+</tr>
+</tbody></table>
+<p>闭塞输出1表示不额外压暗，0表示更受闭塞遮挡；最终阴影还要与主光照等合成。制作AO时先得到白&#x3D;无遮挡、黑&#x3D;遮挡的黑白图，再映射到Alpha约5～64；不需要AO的区域可按心月狐填102。64是可用的无闭塞起点，102是原图常见中性值。</p>
+<p><strong>接入：</strong> D的Color接转换组D，Alpha接D_alpha；图片sRGB，Alpha按打包数据保存，原D使用CHANNEL_PACKED。PNG在文件浏览器里可能半透明，这不等于衣服在工程里半透明。</p>
+<p><strong>检查：</strong> 暂关额外发光，用侧光看接缝是否只是局部压暗。普通区域若无灯也异常亮，先检查Alpha和发光支路；不要先把阴影颜色拉黑。</p>
+<h4 id="3-2-N：RG法线，Alpha粗糙度"><a href="#3-2-N：RG法线，Alpha粗糙度" class="headerlink" title="3.2 N：RG法线，Alpha粗糙度"></a>3.2 N：RG法线，Alpha粗糙度</h4><p><strong>原案例：</strong> <code>Cloth_N.png</code> 为2K，常见平坦RGB约(127,128,0)，所以看起来偏黄绿色。不是法线导出坏了。N的Alpha有例如46、207、245等不同灰度，当前直接送给粗糙度。</p>
+<table>
+<thead>
+<tr>
+<th>通道</th>
+<th>当前读法</th>
+<th>怎样制作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R&#x2F;G</td>
+<td>法线两分量，送 <code>绿法线转法线</code></td>
+<td>烘焙高模褶皱&#x2F;缝线&#x2F;凹凸，再核对方向</td>
+</tr>
+<tr>
+<td>B</td>
+<td>当前转换不使用输入B恢复法线</td>
+<td>照原图可留0，不把它当粗糙度</td>
+</tr>
+<tr>
+<td>A</td>
+<td>粗糙度</td>
+<td>越黑越光滑，越白越粗糙</td>
+</tr>
+</tbody></table>
+<p>建议起点：粗布A约200～245，皮革约100～180，光滑装饰约40～100。这些是新图制作起点，不是从原图给每块材质反推的硬性规定；金属也能很粗糙，不能把“金属”与“低粗糙度”绑定。</p>
+<p>在美术源文件里保留普通法线和粗糙度两份；最后把法线RG和粗糙度A打成一张N。当前组会反转、重建分量，不能只凭OpenGL&#x2F;DirectX导出名称保证完全匹配。用一条确认凸起的缝线试灯：凹凸反了就核对通道方向，先别改模型。</p>
+<p><strong>接入：</strong> N.Color→N，N.Alpha→N_alpha，Non-Color。无凹凸的初稿可用RG&#x3D;(0.5,0.5)，B&#x3D;0，Alpha按表面粗糙度。它不需要借助普通法线图的蓝色外观。</p>
+<h4 id="3-3-FTM：R透明，G金属，B战损"><a href="#3-3-FTM：R透明，G金属，B战损" class="headerlink" title="3.3 FTM：R透明，G金属，B战损"></a>3.3 FTM：R透明，G金属，B战损</h4><p><strong>原案例：</strong> <code>Cloth_FTM.png</code> 为2K，R大多白，G随区域变化，B常见126附近。原Up、Down也有不同强度的G；原图不是只有黑白两档金属度。</p>
+<table>
+<thead>
+<tr>
+<th>通道</th>
+<th>工程含义</th>
+<th>自己怎么画</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R</td>
+<td>不透明度</td>
+<td>实体衣服255；镂空0；薄纱&#x2F;柔边按需要用灰</td>
+</tr>
+<tr>
+<td>G</td>
+<td>金属度</td>
+<td>普通布料0；纯金属可先255；混合效果用灰</td>
+</tr>
+<tr>
+<td>B</td>
+<td>转换组提供战损输出</td>
+<td>当前三套普通衣服主链未使用它，照原图留126或初版0均不影响这一路</td>
+</tr>
+<tr>
+<td>A</td>
+<td>当前转换组不读取</td>
+<td>不用它放当前透明控制</td>
+</tr>
+</tbody></table>
+<p>可直接照着填的初稿：普通实体布料RGB&#x3D;(255,0,126)，纯金属RGB&#x3D;(255,255,126)，镂空非金属RGB&#x3D;(0,0,126)。这些是按当前接线构建的起点，不代表真实原贴图只有三种颜色。</p>
+<p><strong>接入：</strong> Color→FTM，Non-Color。不要把常规ORM（AO&#x2F;粗糙度&#x2F;金属）的RGB打包图直接放进这个入口，通道不相同。</p>
+<p><strong>检查：</strong> 先把R单独看成黑白，确认需要镂空的位置才变黑；再看G，确认金属装饰与布料分开。Alpha即使全黑也不是这个入口判断透明的依据。</p>
+<h4 id="3-4-RGID：低灰度分区编号"><a href="#3-4-RGID：低灰度分区编号" class="headerlink" title="3.4 RGID：低灰度分区编号"></a>3.4 RGID：低灰度分区编号</h4><p><strong>原案例：</strong> 三套服装RGID常见像素是RGB&#x3D;(0,0,0)、(16,16,16)、(32,32,32)、(48,48,48)、(64,64,64)。它们是编号，不是表面的颜色，也不是R&#x2F;G&#x2F;B各放一个独立遮罩。</p>
+<p>转换组先做Gamma约0.454545，再进 <code>ID选区</code>。对于三个通道相同的8bit灰度：</p>
+<table>
+<thead>
+<tr>
+<th align="right">原像素灰度</th>
+<th align="right">转换后的ID位置，约</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">0</td>
+<td align="right">0.000</td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td align="right">0.284</td>
+</tr>
+<tr>
+<td align="right">32</td>
+<td align="right">0.389</td>
+</tr>
+<tr>
+<td align="right">48</td>
+<td align="right">0.468</td>
+</tr>
+<tr>
+<td align="right">64</td>
+<td align="right">0.534</td>
+</tr>
+</tbody></table>
+<p>原Down有位置0.2833的选区接Matcap，有位置0.4583的选区接另一层Matcap，也有0.5333的选区参与调色&#x2F;阴影混合。因此你可以照原图用这些低灰度，但必须核对复制的选区到底接了什么。不能说“64统一代表金属”：不同材质中的接线用途不完全一样。金属度本身由FTM.G决定。</p>
+<p><strong>你制作：</strong> 给希望分开调整的布料、饰物、皮革等区域分配不同编号，用同值RGB画清楚，保留区域说明。将对应 <code>ID选区</code> 的位置调到上述解码值；范围与过渡控制误差和边界。</p>
+<p><strong>检查：</strong> 暂把选区结果用黑白显示，白应只覆盖目标区域。新图若使用更宽的0～255编号也可以，但要重调位置；只改图、不改原位置会选错。</p>
+<h4 id="3-5-三套衣服的具体图片入口"><a href="#3-5-三套衣服的具体图片入口" class="headerlink" title="3.5 三套衣服的具体图片入口"></a>3.5 三套衣服的具体图片入口</h4><table>
+<thead>
+<tr>
+<th>材质简称</th>
+<th>D</th>
+<th>FTM</th>
+<th>N</th>
+<th>RGID</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Cloth</td>
+<td>Image Texture</td>
+<td>Image Texture.001</td>
+<td>Image Texture.002</td>
+<td>Image Texture.003</td>
+</tr>
+<tr>
+<td>Up</td>
+<td>Image Texture</td>
+<td>Image Texture.001</td>
+<td>Image Texture.003</td>
+<td>Image Texture.004</td>
+</tr>
+<tr>
+<td>Down</td>
+<td>Image Texture.001</td>
+<td>Image Texture.002</td>
+<td>Image Texture.003</td>
+<td>Image Texture</td>
+</tr>
+</tbody></table>
+<p>节点名是稳定查找名；以图片名和实际连线再次确认，节点排列位置可能被用户移动。</p>
+<h4 id="3-6-Up-FX：基础四张之外的流动发光"><a href="#3-6-Up-FX：基础四张之外的流动发光" class="headerlink" title="3.6 Up_FX：基础四张之外的流动发光"></a>3.6 Up_FX：基础四张之外的流动发光</h4><p>当前Up的 <code>Group.005</code> 使用 <code>心月狐UP_FX</code>，未静音。它内部两次读 <code>T_R2T1XinMd10011Up_FX.png</code>：一份Color经过运动的UV，另一份Alpha提供原UV上的范围，二者相乘，再经Gamma等叠加到颜色。</p>
+<p>保留这个效果时：FX.RGB画希望流动的亮纹，FX.A画允许显示它的区域；Alpha&#x3D;0的地方不显示这层。原图2K、sRGB、CHANNEL_PACKED。它与D.Alpha的普通发光编码不是同一入口。</p>
+<p>自己的衣服不需要流动纹样，可以关闭&#x2F;旁路这一组，从而仍是基础四张。不要仅换D却让内部FX继续读取心月狐的UV图。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/05-sdf-threshold.png" alt="光角与SDF阈值的关系曲线及RGBA打包要求" width="1600" height="900" loading="lazy" decoding="async"></a>
+<figcaption>根据当前节点计算绘制的说明图（点击图片查看大图）</figcaption>
+</figure>
+
+<p><a id="spec-4"></a></p>
+<h3 id="4-脸：D、SDF、HET分别负责什么"><a href="#4-脸：D、SDF、HET分别负责什么" class="headerlink" title="4. 脸：D、SDF、HET分别负责什么"></a>4. 脸：D、SDF、HET分别负责什么</h3><figure>
+<a href="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/03-face-eye-channels.png" alt="脸和眼睛通道" width="1264" height="730" loading="lazy" decoding="async"></a>
+<figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
+</figure>
+
+<h4 id="4-1-Face-D"><a href="#4-1-Face-D" class="headerlink" title="4.1 Face_D"></a>4.1 Face_D</h4><p>原 <code>Face_D.png</code> 为2K，RGB画肤色、腮红、嘴唇、眉眼纹样；Alpha常见102。可以用自己的脸部颜色图，但要检查Alpha；当前脸也使用D.Alpha的闭塞输出。</p>
+<p>原Face主光照使用平法线常量，并没有普通脸N贴图。当前留着的Face_FTM图也没有把透明&#x2F;金属&#x2F;战损输出送入脸的可见主链。因此准备脸D、SDF和需要的HET即可，不能见到一个旧图片节点就判断必须再画一张。</p>
+<h4 id="4-2-Face-SDF：随光角度改变的阴影阈值"><a href="#4-2-Face-SDF：随光角度改变的阴影阈值" class="headerlink" title="4.2 Face_SDF：随光角度改变的阴影阈值"></a>4.2 Face_SDF：随光角度改变的阴影阈值</h4><p>原资源为 <code>T_FemaleMFace_SDF.png</code>，1K，放在 <code>基础光照</code> 内部的Image to Closure。它是有多个通道的数据图，当前脸SDF函数的解码选项取：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S = (R + B + A) / 3</span><br><span class="line">t = 0.5 - 0.5*cos(水平光角)</span><br><span class="line">明面 = smoothstep(t - 过渡, t + 过渡, S)</span><br></pre></td></tr></table></figure>
+
+<p>这里S、t取0～1。S高的区域在光转到侧后方时更晚进入阴影。当前参数以180°为全角范围；正面t&#x3D;0，60° t&#x3D;0.25，90° t&#x3D;0.5，120° t&#x3D;0.75，背面t&#x3D;1。脸过渡约0.05。</p>
+<p>灯从左右照时，当前配置按方向切换U与1-U采样，镜像中心是U&#x3D;0.5；左右交换选项也参与决定分支。它依赖头部前方向和上方向，不能只看贴图有没有加载。</p>
+<p><strong>制作要求：</strong> 每个脸UV点的灰度记录它进入阴影的角度，鼻子、脸颊、嘴周的变化需要按自己的脸设计；不是把普通AO另存为SDF。用不同角度的目标阴影参考来确定阈值，且同一侧各角度阴影应有可用单阈值表达的顺序。如果某点反复亮暗，一张这种阈值图无法完全表达。</p>
+<p><strong>一张灰度图怎么交：</strong> 灰度值同时写进RGBA四个通道，Non-Color，CHANNEL_PACKED。这样当前RBA均值才恰好等于你的灰度。不要交“RGB灰度、Alpha全255”的普通PNG：当前会读成(2*S+1)&#x2F;3，阈值被抬高。镜像UV、头部方向、阴影样式也要满足当前配置，通道格式对不等于所有脸都能直接通用。</p>
+<p><strong>接入：</strong> 脸D在根材质，SDF在主光照所用组内部。先让该组成为自己角色独立副本再换内部图片；仅复制最外层材质不会自动复制里面的共享组。</p>
+<p><strong>检查：</strong> 正面左右脸都正常受光；±60°鼻部&#x2F;脸颊阴影能换边；侧后方阴影继续增长；转头后阴影仍跟着头的朝向。不能只在固定灯光、固定相机下看一次。</p>
+<h4 id="4-3-Face-HET：供eye-mask和局部调色使用"><a href="#4-3-Face-HET：供eye-mask和局部调色使用" class="headerlink" title="4.3 Face_HET：供eye_mask和局部调色使用"></a>4.3 Face_HET：供eye_mask和局部调色使用</h4><p>原 <code>Face_HET.png</code> 为256，RGB基本黑白；<code>.001</code>为同素材的另一数据副本。根材质两次采样，一路Non-Color灰度与0.5做大于比较，另一路sRGB灰度相乘，得到 <code>eye_mask</code>。对于纯黑白图，白得到1，黑得到0。还有1-HET参与局部调色系数，该调色组当前处于静音状态。</p>
+<p>Face_HET不是SDF，不能决定鼻影形状。原图白块在其特定UV位置，不能仅看图片白块就认定它是你模型眼睛的坐标。自己的图要按自己脸UV制作与预览 <code>eye_mask</code>，需要允许眼透叠加的范围设白，其他位置设黑；若需要眉睫也参与，范围一起设计。检查遮住眼睛的刘海下是否只出现预期内容，不要把耳朵、脖子透出来。</p>
+<p>根材质有两份HET采样时都要换到对应的新素材；保留原采样方式。最终眼透还依赖刘海的NPR输出、眼透强度和视角控制，HET放上去不代表完整系统已适配。</p>
+<p>关闭眼透和这一路局部调色后可省HET，脸就D+SDF两张。</p>
+<p><a id="spec-5"></a></p>
+<h3 id="5-刘海和后发：D、FTM、HM、HN"><a href="#5-刘海和后发：D、FTM、HM、HN" class="headerlink" title="5. 刘海和后发：D、FTM、HM、HN"></a>5. 刘海和后发：D、FTM、HM、HN</h3><figure>
+<a href="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/02-hair-channels.png" alt="头发通道" width="1496" height="730" loading="lazy" decoding="async"></a>
+<figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
+</figure>
+
+<h4 id="5-1-Hair-Bangs-D"><a href="#5-1-Hair-Bangs-D" class="headerlink" title="5.1 Hair&#x2F;Bangs_D"></a>5.1 Hair&#x2F;Bangs_D</h4><p>原图各2K，RGB有冷白发色、发束深浅、根梢与细节，Alpha常见102。制作自己的发色与手绘纹理，Alpha按闭塞约定处理。这个Alpha不是当前发片透明入口。</p>
+<h4 id="5-2-HM：三路不同的美术控制"><a href="#5-2-HM：三路不同的美术控制" class="headerlink" title="5.2 HM：三路不同的美术控制"></a>5.2 HM：三路不同的美术控制</h4><p>原刘海和后发HM各2K，当前 <code>头发高光分支</code> 与 <code>基础光照</code> 的真实接线如下。</p>
+<table>
+<thead>
+<tr>
+<th>通道</th>
+<th>用途</th>
+<th>原案例观察</th>
+<th>自己怎么做</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>R</td>
+<td>高光允许遮罩，乘到高光上</td>
+<td>大部分黑，部分发束上的条状区域白</td>
+<td>希望出高光的发束区域画白，排除区域黑，边缘可灰</td>
+</tr>
+<tr>
+<td>G</td>
+<td>主光照阴影偏移的附加控制</td>
+<td>有发束纹理，常见底值约65～82</td>
+<td>初版可先0；需要调整局部二分时再画灰，当前贡献约G*0.1</td>
+</tr>
+<tr>
+<td>B</td>
+<td>高光曲线参数，参与宽度&#x2F;凸起形状</td>
+<td>刘海有区域变化；后发B基本黑</td>
+<td>初版0可参考后发；刘海需要局部形状变化时再绘制</td>
+</tr>
+</tbody></table>
+<p>HM.R可以有条状形，但它依然是“允许动态高光的区域”：最终高光还受HN、灯光、视角、偏移&#x2F;宽度影响；不是涂白就永远固定白。</p>
+<p>HM.B不是粗糙度，也不能简单断言白&#x3D;一定更宽。它与全局宽度、凸起强度共同计算；用一束头发对比不同B值后，再扩展到全头。</p>
+<h4 id="5-3-HN：当前高光读取G，不是普通法线"><a href="#5-3-HN：当前高光读取G，不是普通法线" class="headerlink" title="5.3 HN：当前高光读取G，不是普通法线"></a>5.3 HN：当前高光读取G，不是普通法线</h4><p>原HN只有256×256，当前分支只取G通道作为高光曲线的输入场，图解里的原G可见发束区域渐变。它没有送进普通法线解码器，不能把紫色头发法线直接放这个槽。</p>
+<p>做新角色的可执行起步方法：每束头发单独建立连续灰度梯度，尽量让同一视觉高光带经过的位置具有相近的G值；梯度写入G，R&#x2F;B先留常量。可以先试根到梢的梯度，再用高光“偏移、宽度、翻转方向”找位置；原图并不能证明所有发束都是同一根梢线性梯度，需要根据发束实际形状修正。</p>
+<p>检查不同发束是否接成连贯的带；若断裂，先核对G值是否连贯、HM.R是否允许；如果整个高光带位置错了，先调偏移或HN场，不要仅加大系数。256是原案例尺寸，自己更细的发束可以提高尺寸，但做对场比盲目4K更重要。</p>
+<h4 id="5-4-FTM：主要读R参与刘海NPR透明"><a href="#5-4-FTM：主要读R参与刘海NPR透明" class="headerlink" title="5.4 FTM：主要读R参与刘海NPR透明"></a>5.4 FTM：主要读R参与刘海NPR透明</h4><p>原前后发FTM各512，G大多0、B常见126；刘海R有灰色变化，后发R大多白。当前FTM.R写到“头发透明”AOV，刘海的NPR树再结合折射、顶点色与眼透处理，不是一个通用材质Alpha直接混合就结束。</p>
+<p>需要发片镂空&#x2F;柔边或刘海透明范围时，R按目标画：实心255、去掉0、中间过渡用灰。后发实体发块、不需要空间变化时，FTM可以换为RGB&#x3D;(1,0,126&#x2F;255)常量，省一个文件。不要直接删图而让旧图片&#x2F;默认值继续生效。</p>
+<h4 id="5-5-HR：共享的高光色带"><a href="#5-5-HR：共享的高光色带" class="headerlink" title="5.5 HR：共享的高光色带"></a>5.5 HR：共享的高光色带</h4><p>原 <code>T_R2T1XinMd10011Bangs_HR.png</code> 是512×4，前后发都用其sRGB数据副本。它沿高光曲线取颜色，不按角色发束UV贴上去。复制发材质时可以继续复用，最后调色；换单色高光模式也可不用HR。</p>
+<p>原头发高光参数可作参照，不能直接保证适合新图：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th align="right">Hair后发</th>
+<th align="right">Bangs刘海</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>模式</td>
+<td align="right">渐变高光</td>
+<td align="right">渐变高光</td>
+</tr>
+<tr>
+<td>系数</td>
+<td align="right">0.745</td>
+<td align="right">0.745</td>
+</tr>
+<tr>
+<td>偏移</td>
+<td align="right">-0.17</td>
+<td align="right">-0.12</td>
+</tr>
+<tr>
+<td>宽度</td>
+<td align="right">6.92</td>
+<td align="right">-1.67</td>
+</tr>
+<tr>
+<td>凸起强度</td>
+<td align="right">10.79</td>
+<td align="right">10.79</td>
+</tr>
+<tr>
+<td>运动强度</td>
+<td align="right">0.35</td>
+<td align="right">0.35</td>
+</tr>
+<tr>
+<td>光照影响强度</td>
+<td align="right">-0.48</td>
+<td align="right">-0.48</td>
+</tr>
+<tr>
+<td>高光明度</td>
+<td align="right">1.00</td>
+<td align="right">0.55</td>
+</tr>
+</tbody></table>
+<p>这套宽度是模块内部控制值，允许负数，不是毫米或屏幕像素。前后发原参数差异明显，所以应分别调。</p>
+<h4 id="5-6-根材质入口"><a href="#5-6-根材质入口" class="headerlink" title="5.6 根材质入口"></a>5.6 根材质入口</h4><table>
+<thead>
+<tr>
+<th>材质简称</th>
+<th>D</th>
+<th>FTM</th>
+<th>HM</th>
+<th>HN</th>
+<th>HR资源</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hair</td>
+<td>Image Texture</td>
+<td>Image Texture.001</td>
+<td>Image Texture.002</td>
+<td>Image Texture.003</td>
+<td>Image Texture.004</td>
+</tr>
+<tr>
+<td>Bangs</td>
+<td>Image Texture.001</td>
+<td>Image Texture.002</td>
+<td>Image Texture.003</td>
+<td>Image Texture.004</td>
+<td>Image Texture.005</td>
+</tr>
+</tbody></table>
+<p>Bangs的另一个 <code>Image Texture</code> 是未接到这条有效高光链的HR节点，不要只换它。换D&#x2F;FTM&#x2F;HM&#x2F;HN后，先单色高光看范围与运动，再恢复渐变看颜色。</p>
+<p><a id="spec-6"></a></p>
+<h3 id="6-眼睛：D、HET，以及可复用的高光资源"><a href="#6-眼睛：D、HET，以及可复用的高光资源" class="headerlink" title="6. 眼睛：D、HET，以及可复用的高光资源"></a>6. 眼睛：D、HET，以及可复用的高光资源</h3><p><strong>Eye_D：</strong> 原图2K，RGB已经有虹膜、瞳孔、眼白和手绘细节。按自己眼球UV画，别把大面积方向性高光当成必须画死的部分；动态点高光另有模块。原D.Alpha多为128，当前虽然接入转换组，但闭塞&#x2F;发光输出未接到眼睛的对应主链，不能把128当眼睛透明度。</p>
+<p><strong>Eye_HET：</strong> 原图256、sRGB，是最终HSV调色Factor：白允许调色，黑保留输入，灰混合。想只改虹膜就把虹膜区域画白，眼白画黑。这与Face_HET的eye_mask是两张用途不同的图。保持当前不需要局部调色时可设常量或旁路，省HET。</p>
+<p><strong>T_HDMF_EM.png：</strong> 512、Non-Color，提供视差与高光素材图集。可以复用，不必每个角色画一份。当前眼睛D经过Parallax UV采样，点高光也有自己的UV&#x2F;图集处理；先确保眼睛UV中心、比例与视差采样正确，再调高光位移、大小、强度。</p>
+<p>原眼睛高光起点：细节强度0.4583、点高光强度0.5333、位移(0.19,-0.14)、大小0.06，第二高光强度0；点高光旋转有时间接线，不能只看未连线默认值。需要静止示例时另行关闭&#x2F;固定这一动画来源。</p>
+<p>根材质 <code>Image Texture</code>&#x3D;D，<code>.001</code>&#x3D;HET，<code>.006</code>&#x3D;EM资源；<code>.002</code>的第二高光旧图没有接入当前主链，不用因它还在节点中就新增一个制作任务。</p>
+<p>这是原模板的入口规范。自己的虹膜若放在头部图集的一角，还需要把图集UV与特效UV分开；这次模型的具体适配见<a href="#make-9">制作9</a>。该节新增的最低亮度节点属于自用材质调整，原模板没有这项控制。</p>
+<p><a id="spec-7"></a></p>
+<h3 id="7-尾巴：先分清普通表面和体积毛"><a href="#7-尾巴：先分清普通表面和体积毛" class="headerlink" title="7. 尾巴：先分清普通表面和体积毛"></a>7. 尾巴：先分清普通表面和体积毛</h3><figure>
+<a href="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/04-tail-channels.png" alt="尾巴额外通道" width="1496" height="439" loading="lazy" decoding="async"></a>
+<figcaption>原贴图的通道诊断预览；黑白格表示该通道值，不能当作材质贴图使用（点击图片查看大图）</figcaption>
+</figure>
+
+<p>原Tail不是普通Hair模板，它混合普通表面、分区透明、视角轮廓效果和毛层：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>当前读到的用途</th>
+<th>你制作时注意</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tail_D，1K</td>
+<td>基础色、闭塞；同时在内部图像闭包里作局部模糊取色</td>
+<td>两处都替换，RGB做尾巴底色&#x2F;毛色过渡</td>
+</tr>
+<tr>
+<td>Tail_RGID，1K</td>
+<td>编号选不同区域及分支</td>
+<td>常见低灰度1、4等，经Gamma解码后才是选区值；不能照衣服的编号意义推测</td>
+</tr>
+<tr>
+<td>Tail_ID，512</td>
+<td>当前只分离R，参与选中区域的不透明度</td>
+<td>按尾巴UV画，黑白&#x2F;灰表示这一路局部透明；不要当RGID替代品</td>
+</tr>
+<tr>
+<td>Tail_N，1K</td>
+<td>接到转换组；但主光照选择世界空间法线、粗糙度未进普通GGX链</td>
+<td>当前有槽不等于烘焙N一定能改变主要尾巴光照，不把它列为普通尾巴入门必需</td>
+</tr>
+<tr>
+<td>角色_M，2K</td>
+<td>当前读取Alpha，UV入口明确为UV2；经色带用于视角透明与颜色效果</td>
+<td>是另一套UV布局，不能直接复制Tail_D的岛位就保证对应</td>
+</tr>
+<tr>
+<td>T_FurHeight_M，256资源</td>
+<td>毛纹高度经层值比较形成毛层可见性</td>
+<td>可复用；不是让普通单层网格自动长出毛</td>
+</tr>
+<tr>
+<td>T_Normal_Flowmap_40002，128资源</td>
+<td>RGB映射到-1～1，扰动毛纹采样UV，扰动幅度随layer变化</td>
+<td>当前作用是采样扰动，可复用；别仅凭文件名当作普通法线或手工梳毛图</td>
+</tr>
+</tbody></table>
+<p>材质还读 <code>毛</code>、<code>layer</code>、<code>sm_nor</code> 等属性。当前尾巴 <code>多层毛发</code> 几何节点修改器参数是32层、厚度1.51，但视图&#x2F;渲染开关均关闭。组内厚度再除100参与位移，所以不要直接把1.51理解为1.51米；也不能只换图片就宣称已开启体积毛。</p>
+<p>普通尾巴初版可以只做底色与需要的分区&#x2F;透明；要完整毛层效果，再适配几何与属性。上述五张角色图是原槽位供料清单，不是所有尾巴必须画五张。</p>
+<p><a id="spec-8"></a></p>
+<h3 id="8-身体、眉睫、描边与灯光"><a href="#8-身体、眉睫、描边与灯光" class="headerlink" title="8. 身体、眉睫、描边与灯光"></a>8. 身体、眉睫、描边与灯光</h3><p><strong>身体皮肤：</strong> 原Up&#x2F;Down图集已有皮肤区域，不一定另开Body贴图；N.A控制皮肤表面粗糙度，FTM.G在非金属皮肤区域应接近0，SSS&#x2F;阴影色可由材质调。身体不用脸的SDF。</p>
+<p><strong>眉毛、睫毛：</strong> 实体网格可以纯色或共用脸图集；发片需要其材质实际透明入口的遮罩。不要把脸D.Alpha默认当成睫毛透明。数量取决于你的材质&#x2F;UV划分，原八类图集之外不自动再加固定数量。</p>
+<p><strong>描边：</strong> 不必多画一张“描边贴图”。原 <code>描边材质</code> 读COL0顶点色G控制宽度、读UV1里的特殊压缩法线，并使用“描边排除”属性。UV1是编码数据，不是随便展UV或复制UV0能替代。换自己的模型时，需要正确准备这些数据或使用适合自己模型的法线来源；只把描边材质赋上去并调宽度，不能保证原效果。</p>
+<p><strong>脸边缘光：</strong> 当前脸根材质还读顶点色B控制部分边缘光。顶点色与图片是两种不同的数据，缺这些控制时即使贴图都齐，也会出现效果差异。</p>
+<p><strong>灯光&#x2F;画面：</strong> 复制现有灯光与材质可以继续用，但灯光方向、强度、世界、阴影和色彩管理要一起检查。源工程Standard、Look None、曝光0、Gamma1是已导出的参考设置，不代表用户此刻每项都未改动。亮色、阴影色、SSS、边缘光、Matcap强度主要是可调参数，不要求每个效果再增加一张图。</p>
+<p><a id="spec-9"></a></p>
+<h3 id="9-导出与接入的一次完整流程"><a href="#9-导出与接入的一次完整流程" class="headerlink" title="9. 导出与接入的一次完整流程"></a>9. 导出与接入的一次完整流程</h3><ol>
+<li>分材质、确定哪些网格共用图集，完成自己的UV；颜控图都沿用同一图集的岛位。</li>
+<li>先制作&#x2F;接入D，检查RGB与Alpha，不要等所有控制图都完成才发现UV错位。</li>
+<li>衣服做普通法线源图和粗糙度源图，再打包N；用一条凸起缝线验方向。</li>
+<li>单独画透明、金属、战损源通道，打包FTM；单独画分区编号得到RGID，登记编号用途。</li>
+<li>脸使用自己的SDF，保留完整RGBA数据、镜像约定和头部方向；需要眼透再做Face_HET。</li>
+<li>头发先HM.R和HN.G建立高光范围与位置，再调HM.G&#x2F;B；必要时画FTM.R，先单色后渐变调高光。</li>
+<li>眼睛先D&#x2F;UV，再视差、动态高光与HET；最后处理Up_FX、尾巴等附加部分。</li>
+<li>Blender中D&#x2F;FX等颜色图用原用途的sRGB；N&#x2F;FTM&#x2F;RGID&#x2F;HM&#x2F;HN&#x2F;SDF用Non-Color。原HET、HR、毛纹&#x2F;Flow存在各自采样设置，保留对应入口的设置，不能统统按后缀一键改。Alpha存储独立数据时保留RGBA并按打包数据使用。</li>
+<li>外层材质复制后逐个检查共享内部组和图片，尤其SDF、FX、Tail图像闭包。仅换根节点的D不够。</li>
+<li>最后处理描边模型数据、边缘光、SSS、Matcap与特效，固定灯光转完整视图，固定模型转灯光，分别检查。</li>
+</ol>
+<p><a id="spec-10"></a></p>
+<h3 id="10-验收时逐项看什么"><a href="#10-验收时逐项看什么" class="headerlink" title="10. 验收时逐项看什么"></a>10. 验收时逐项看什么</h3><table>
+<thead>
+<tr>
+<th>检查点</th>
+<th>通过的样子</th>
+<th>常见原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础色</td>
+<td>花纹、脸妆、虹膜落在自己的UV位置</td>
+<td>未替换旧图或UV不一致</td>
+</tr>
+<tr>
+<td>闭塞&#x2F;发光</td>
+<td>AO只压暗目标局部，普通布料不自行发亮</td>
+<td>D.Alpha误填255或源图Alpha丢失</td>
+</tr>
+<tr>
+<td>法线</td>
+<td>同一凸缝从两侧打光符合凸起表现</td>
+<td>解码&#x2F;绿色方向或UV切线问题</td>
+</tr>
+<tr>
+<td>粗糙度&#x2F;金属</td>
+<td>布、皮、金属各有预期亮斑</td>
+<td>N.A、FTM.G混放成ORM</td>
+</tr>
+<tr>
+<td>分区</td>
+<td>每层调色&#x2F;Matcap只改选中的区域</td>
+<td>RGID位置未经过Gamma换算或旧节点用途不同</td>
+</tr>
+<tr>
+<td>脸SDF</td>
+<td>正面自然、左右阴影换边、转头仍跟随</td>
+<td>SDF.A不对、镜像中心错、头部方向没跟随</td>
+</tr>
+<tr>
+<td>头发高光</td>
+<td>发束连贯、灯&#x2F;视角变动没有意外整片亮白</td>
+<td>HM.R太大、HN.G不连贯、原偏移&#x2F;宽度不适合</td>
+</tr>
+<tr>
+<td>眼透</td>
+<td>刘海下只出现需要的眼部内容，侧面控制合理</td>
+<td>Face_HET未按新UV做、NPR&#x2F;视角设置未适配</td>
+</tr>
+<tr>
+<td>描边</td>
+<td>近远、侧背面都连续，局部粗细可控</td>
+<td>UV1编码、顶点色G或排除属性缺失</td>
+</tr>
+<tr>
+<td>尾巴毛层</td>
+<td>有真实层值与几何，疏密和轮廓随设置改变</td>
+<td>只换图，修改器仍关闭或属性缺失</td>
+</tr>
+</tbody></table>
+<h2 id="第二部分：怎样从源图和模型做出这些数据"><a href="#第二部分：怎样从源图和模型做出这些数据" class="headerlink" title="第二部分：怎样从源图和模型做出这些数据"></a>第二部分：怎样从源图和模型做出这些数据</h2><p><a id="make-1"></a></p>
+<h3 id="1-先准备哪些工作文件"><a href="#1-先准备哪些工作文件" class="headerlink" title="1. 先准备哪些工作文件"></a>1. 先准备哪些工作文件</h3><p>不要一开始就直接在最终打包图里混着画。美术制作阶段保存独立源图或图层，最后再打包：</p>
+<table>
+<thead>
+<tr>
+<th>工作文件&#x2F;图层</th>
+<th>最后放哪里</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>衣服、脸、头发、眼睛固有色</td>
+<td>各部位D.RGB</td>
+</tr>
+<tr>
+<td>AO&#x2F;闭塞工作图</td>
+<td>经过数值映射后放D.Alpha；眼睛当前对应输出未使用</td>
+</tr>
+<tr>
+<td>普通切线法线源图</td>
+<td>按当前解码适配后放衣服N.RG</td>
+</tr>
+<tr>
+<td>粗糙度黑白图</td>
+<td>N.Alpha</td>
+</tr>
+<tr>
+<td>不透明度黑白图</td>
+<td>衣服&#x2F;头发FTM.R；尾巴走其实际专用入口</td>
+</tr>
+<tr>
+<td>金属度黑白图</td>
+<td>衣服FTM.G</td>
+</tr>
+<tr>
+<td>分区编号图</td>
+<td>RGID.RGB</td>
+</tr>
+<tr>
+<td>头发高光允许区、二分偏移、形状控制</td>
+<td>分别HM.R&#x2F;G&#x2F;B</td>
+</tr>
+<tr>
+<td>头发高光输入场</td>
+<td>HN.G</td>
+</tr>
+<tr>
+<td>面部阴影阈值场</td>
+<td>SDF数据通道</td>
+</tr>
+<tr>
+<td>眼透范围&#x2F;眼睛局部调色范围</td>
+<td>对应Face_HET或Eye_HET</td>
+</tr>
+</tbody></table>
+<p>例如一套衣服最终交四张图，美术源文件里可以有颜色、AO、普通法线、粗糙度、透明、金属、ID七类图层。这能让你分别修改效果，而不是每次都拆最终PNG。</p>
+<p>图层透明度与图片Alpha通道是不同东西。做D&#x2F;N&#x2F;SDF等打包图时，检查保存后实际RGBA像素；不要用降低整个图层不透明度的方法代替写数据Alpha。保留PSD&#x2F;KRA或其他可编辑源文件，最终导出有Alpha的PNG&#x2F;TGA，数据图不经过额外调色或显示变换。</p>
+<p><a id="make-2"></a></p>
+<h3 id="2-正确的制作先后顺序"><a href="#2-正确的制作先后顺序" class="headerlink" title="2. 正确的制作先后顺序"></a>2. 正确的制作先后顺序</h3><ol>
+<li>确认材质划分和图集划分，整理自己的UV0。</li>
+<li>确定低模拓扑、硬边、平滑和需要保留的自定义法线；准备最终烘焙所用三角化方案。</li>
+<li>画D基础色，先确认UV位置正确；烘焙AO&#x2F;普通法线作源素材。</li>
+<li>分开绘制粗糙度、金属、透明、ID，再打包衣服控制图。</li>
+<li>做脸SDF和需要的HET，做头发HM&#x2F;HN。</li>
+<li>处理眼睛UV、视差和高光，再增加FX&#x2F;尾巴等选用功能。</li>
+<li>根据最后的低模法线与UV0切线生成描边UV1，绘制COL0.G等模型控制数据。</li>
+<li>转灯、转头、转视角验收，然后再导出供其他工程使用的模型。</li>
+</ol>
+<p>低模的法线、UV0或三角化方案改变后，已有法线烘焙和依赖切线空间的描边数据都应重新核对；不要把这些基础改动当成只影响模型外观。</p>
+<p><a id="make-3"></a></p>
+<h3 id="3-衣服D：怎样画固有色和闭塞"><a href="#3-衣服D：怎样画固有色和闭塞" class="headerlink" title="3. 衣服D：怎样画固有色和闭塞"></a>3. 衣服D：怎样画固有色和闭塞</h3><p><strong>心月狐参考：</strong> Cloth&#x2F;Up&#x2F;Down各一张2K的D，里面的皮肤、饰品、布料可以共用图集。原D.Alpha中性区域常见102。</p>
+<h4 id="RGB工作方法"><a href="#RGB工作方法" class="headerlink" title="RGB工作方法"></a>RGB工作方法</h4><ol>
+<li>从材质分区开始铺大色块：红布、浅布、皮肤、金属分别独立图层。</li>
+<li>画印花、刺绣、包边、接缝等设计信息。结构清晰的花纹优先保证形状与UV位置。</li>
+<li>用烘焙AO、曲率等辅助定位褶皱和接缝，但按二次元风格清理噪声、控制对比。</li>
+<li>保留想固定的手绘细节和色彩变化。大面积主光方向、投影边界与动态镜面高光留给工程计算，避免旋转灯光时两套光照打架。</li>
+<li>在模型上看正侧背面，确认接缝连续、花纹没有被拉伸；不能只看平面颜色图。</li>
+</ol>
+<h4 id="Alpha工作方法"><a href="#Alpha工作方法" class="headerlink" title="Alpha工作方法"></a>Alpha工作方法</h4><p>先获得白&#x3D;无遮挡、黑&#x3D;闭塞的AO工作图。可以从高低模烘焙或模型自身烘焙开始，再手工清理：减少大片脏黑，保留接缝、夹层、小缝隙等必要压暗。</p>
+<p>当前闭塞映射使用A&#x3D;0.02～0.25。将AO工作图映射为 <code>A=0.02+0.23*AO</code>，8bit约5～64。不需要闭塞的普通区域可按原图填102，仍然是无遮挡且不发光。</p>
+<p>要发光的区域再单独写高于约127的Alpha：约191为半强度控制、255为满控制；最终亮度由发光模块强度等决定。一个Alpha同时承担这些编码，发光区域不能独立保存另一份任意AO，需要先接受这一入口的限制。</p>
+<p><strong>验收：</strong> 关闭额外发光时普通颜色正常，闭塞只在目标部位压暗；打开后只指定装饰亮起。不能把整张D导成Alpha255。</p>
+<p><a id="make-4"></a></p>
+<h3 id="4-衣服N：法线和粗糙度怎样做"><a href="#4-衣服N：法线和粗糙度怎样做" class="headerlink" title="4. 衣服N：法线和粗糙度怎样做"></a>4. 衣服N：法线和粗糙度怎样做</h3><h4 id="先烘焙普通切线法线源图"><a href="#先烘焙普通切线法线源图" class="headerlink" title="先烘焙普通切线法线源图"></a>先烘焙普通切线法线源图</h4><ol>
+<li>高模准备褶皱、接缝、浮雕等细节；低模先确定UV、平滑与硬边。</li>
+<li>高低模匹配位置。投射范围或cage包住需要捕获的高模细节，避免抓到相邻衣片、身体或背面。</li>
+<li>最终低模的三角化与切线基础尽量与烘焙时一致。不要烘焙后随意翻三角、改硬边或重展UV。</li>
+<li>烘焙出普通切线法线，先在模型上检查凸缝、凹缝和UV接缝，再清理误投射。</li>
+</ol>
+<p>如果用Blender烘焙，建议在专门的烘焙副本&#x2F;场景中用Cycles完成：低模材质准备目标图片并选中对应图片节点，高模选中、低模为活动对象，使用Selected to Active的Normal烘焙与适合的cage&#x2F;投射范围。不要直接把带NPR专用节点的原渲染场景切换当成现成的烘焙设置。</p>
+<h4 id="适配这套N入口"><a href="#适配这套N入口" class="headerlink" title="适配这套N入口"></a>适配这套N入口</h4><p>当前 <code>绿法线转法线</code> 使用R&#x2F;G、反转并重建第三分量，输入B不参与恢复。现有转换设置在XY上保留输入R、反转输入G，因此普通OpenGL源图的G反向需要核对。若以相同XY方向为目标，可先试R保留、G&#x3D;1-G、B&#x3D;0，再以凸缝试灯确认；这不是完整三维向量逐项等价的保证，第三分量仍按现有组重建。</p>
+<p>新图无凹凸的区域输入RG约(0.5,0.5)，B可以0。不要对RG执行sRGB调色或把它当黄色图去调饱和度。</p>
+<h4 id="单独制作粗糙度"><a href="#单独制作粗糙度" class="headerlink" title="单独制作粗糙度"></a>单独制作粗糙度</h4><p>用材质类型铺底，再添加适量变化：布料偏粗糙，皮革中等，抛光装饰偏光滑；磨损、接缝、涂层可以局部调整。不要直接将D转灰度当粗糙度，颜色深浅不等于表面粗糙度。</p>
+<p>建议初稿8bit值：粗布200～245、皮革100～180、光滑装饰40～100。它们是起步值，不是强制规范。最后放入N.Alpha，RGB法线数据独立保留。</p>
+<p><strong>验收：</strong> 先侧光检查一条已知凸缝的方向；再固定光照检查粗糙度是否控制亮斑宽窄。某个岛整块发黑应先排查模型法线、投射与切线方向，不能一律归因于粗糙度。</p>
+<p><a id="make-5"></a></p>
+<h3 id="5-衣服FTM：三张工作遮罩合成一张"><a href="#5-衣服FTM：三张工作遮罩合成一张" class="headerlink" title="5. 衣服FTM：三张工作遮罩合成一张"></a>5. 衣服FTM：三张工作遮罩合成一张</h3><h4 id="R不透明度"><a href="#R不透明度" class="headerlink" title="R不透明度"></a>R不透明度</h4><p>实体布料直接白，不必烘焙AO来代替透明。发片&#x2F;蕾丝&#x2F;镂空按设计画形状，剪掉部分黑，保留部分白，柔边适度灰。在线稿与UV边界之外留适合的扩边，防止缩小贴图或过滤时出现意外白边&#x2F;黑边。</p>
+<p>薄纱灰度需要在最终材质中看前后层、背景与排序；灰色不是一个保证物理正确的固定厚度值。</p>
+<h4 id="G金属度"><a href="#G金属度" class="headerlink" title="G金属度"></a>G金属度</h4><p>按材质本身画区域：皮肤、普通布料、非金属皮革黑；金属饰物白或需要的灰度。金色布料、黄色塑料不因为颜色像金属就一定填白。先画明确区域，再按磨损&#x2F;涂层需要细分。</p>
+<h4 id="B战损"><a href="#B战损" class="headerlink" title="B战损"></a>B战损</h4><p>当前三套衣服主要可见链没有使用这一输出。照心月狐原数值可先填126；先不制作复杂战损图。以后启用战损效果时再确认其白黑方向与具体接入功能，不能单凭这个名字画通用刮痕就宣称生效。</p>
+<p>打包R&#x2F;G&#x2F;B，不使用FTM.Alpha控制这里的透明。普通实体布料初稿可为(255,0,126)，纯金属(255,255,126)。数据图片使用Non-Color。</p>
+<p><a id="make-6"></a></p>
+<h3 id="6-RGID：从模型材质分区制作编号图"><a href="#6-RGID：从模型材质分区制作编号图" class="headerlink" title="6. RGID：从模型材质分区制作编号图"></a>6. RGID：从模型材质分区制作编号图</h3><ol>
+<li>先列区域表：例如区域A红布、B皮革、C装饰、D皮肤；编号的含义由你这份材质接线决定。</li>
+<li>可先在模型上分临时材质ID，用无光照的纯色&#x2F;数值输出烘焙到UV，或直接在UV图上填区域。</li>
+<li>将普通彩色ID转换为目标灰度编号。照心月狐可以用0、16、32、48、64，RGB三个通道一致。</li>
+<li>保留清楚的内部纯值，边界适度处理与扩边。不能用AO、颜色噪声或大渐变作为编号内部变化。</li>
+<li>在材质中将 <code>ID选区</code> 位置对应到转换后的值，约0、0.284、0.389、0.468、0.534；同时核对该节点接的是调色、Matcap还是别的效果。</li>
+</ol>
+<p>不要直接把Substance等软件的红绿蓝材质ID作为这套灰度编号使用。数据图Non-Color，转换组内部已有Gamma处理；额外再做同一Gamma会改变位置。</p>
+<p><strong>验收：</strong> 暂看选区黑白结果，白只覆盖目标区域。RGID贴图编号与几何节点生成的整数属性 <code>ID</code> 是两种数据，不能互相混用。</p>
+<p><a id="make-7"></a></p>
+<h3 id="7-脸D、SDF与Face-HET的制作方法"><a href="#7-脸D、SDF与Face-HET的制作方法" class="headerlink" title="7. 脸D、SDF与Face_HET的制作方法"></a>7. 脸D、SDF与Face_HET的制作方法</h3><h4 id="Face-D"><a href="#Face-D" class="headerlink" title="Face_D"></a>Face_D</h4><p>用自己的脸UV画肤色、腮红、眉眼妆容、嘴唇、脸部纹样；左右不对称设计要在UV中保留可独立绘制的空间。小范围必要的手绘阴影可以保留，大块动态鼻影交给SDF。Alpha按闭塞约定处理，初稿普通区域可102。</p>
+<h4 id="从阴影设计制作SDF"><a href="#从阴影设计制作SDF" class="headerlink" title="从阴影设计制作SDF"></a>从阴影设计制作SDF</h4><p>这一工程的SDF是一张“进入阴影的阈值场”。能从已有正确SDF适配就优先适配，不能把普通AO、曲率或某一方向的阴影烘焙直接当最终SDF。</p>
+<p>从零做的可执行思路：</p>
+<ol>
+<li>用自己的脸UV，在一侧光照0°、30°、60°、90°、120°、150°、180°下设计目标亮面&#x2F;暗面，重点看鼻子、脸颊、嘴周。可以拿烘焙&#x2F;渲染阴影作参考，但最终按角色风格修形。</li>
+<li>所有角度参考都转换到同一脸UV。不能把屏幕上的脸轮廓图直接当UV图。</li>
+<li>对每个UV位置确定它从亮转暗的角度θ；中间角度间按目标变化插值。当前比较阈值是 <code>0.5-0.5*cos(θ)</code>，因此把对应值作为该点的SDF。</li>
+<li>例如某点希望约60°进入阴影，阈值约0.25；约90°进入则0.5；约120°进入则0.75。8bit分别约64、128、191。当前过渡宽度会使转换发生在一个角度区间，而非完全瞬时切换。</li>
+<li>同一侧某点若随角度反复亮暗，一张当前形式的单阈值SDF不能完整表达，先清理设计或接受近似。</li>
+<li>平滑阈值场中不需要的噪点，但保持鼻影&#x2F;脸影形状。不能用模糊来掩盖左右或UV错误。</li>
+<li>灰度同时写入RGBA，当前RBA均值才读取到原灰度。Non-Color，CHANNEL_PACKED。若正面或背面端点受软过渡影响，可结合目标效果试验端点限制；不应盲目改掉所有原图数值。</li>
+<li>当前按U与1-U镜像采样，镜像中心0.5。设计与UV需能支持这个约定；任意打散UV后不能期待左右鼻影自动正确。</li>
+</ol>
+<p>已有其他来源的SDF时，先核对其各通道含义与左右编码，再针对这份模板适配；不要假定任何红绿图都能用同一公式完整恢复。</p>
+<h4 id="Face-HET"><a href="#Face-HET" class="headerlink" title="Face_HET"></a>Face_HET</h4><p>按自己脸UV画目标眼透区域：需要允许眼透叠加的区域白，其他黑；如果眉睫也要透，按目标一起画。制作时将遮住眼睛的刘海摆在实际位置，预览 <code>eye_mask</code> 后修边，避免耳朵、脖子也被透出来。</p>
+<p>当前这一路有大于0.5的门限，纯黑白图最容易判断。它不等同于可以随意画一个灰色柔边就获得同样柔边眼透。原图的白块坐标只属于原角色UV，不能照着图片白块硬贴新头。</p>
+<p>两份HET采样都应对应自己的图。关闭眼透及相关局部调色时可省略；不要把Face_HET与眼睛局部调色的Eye_HET合成一个含义不清的通用文件。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/07-hair-controls.png" alt="HM、HN与HR在头发高光中的分工" width="1600" height="900" loading="lazy" decoding="async"></a>
+<figcaption>输入与控制参数的关系示意；并非原贴图作者的绘制过程复原（点击图片查看大图）</figcaption>
+</figure>
+
+<p><a id="make-8"></a></p>
+<h3 id="8-头发D、HM、HN与HR怎样制作"><a href="#8-头发D、HM、HN与HR怎样制作" class="headerlink" title="8. 头发D、HM、HN与HR怎样制作"></a>8. 头发D、HM、HN与HR怎样制作</h3><h4 id="先整理适合绘制的头发UV"><a href="#先整理适合绘制的头发UV" class="headerlink" title="先整理适合绘制的头发UV"></a>先整理适合绘制的头发UV</h4><p>将主要发束按根梢、左右宽度展开成容易连续绘制的岛，尽量减少扭曲；岛不必须全是矩形，但根梢方向最好有清楚标记。不同岛可以旋转打包，前提是你的颜色&#x2F;控制场沿每个岛正确绘制，而不是让shader从普通UV自动猜出哪边是发根。</p>
+<p>发束左右两侧需要不对称高光时，不能无条件重叠镜像岛。前后发共用图集可以节省文件，但要能分别设置材质参数。</p>
+<h4 id="Hair-Bangs-D"><a href="#Hair-Bangs-D" class="headerlink" title="Hair&#x2F;Bangs_D"></a>Hair&#x2F;Bangs_D</h4><p>先铺发色，再按发束分组画根梢变化、挑染和克制的手绘纹理。固定的大亮条会与动态高光叠加，要留意两者强度。Alpha按闭塞约定；发片透明放FTM.R。</p>
+<h4 id="HM-R：高光允许区"><a href="#HM-R：高光允许区" class="headerlink" title="HM.R：高光允许区"></a>HM.R：高光允许区</h4><p>先画黑底。按发束走势选允许出高光的区域，可画清楚、较克制的条状或片状白区，再调整边缘灰度。心月狐原HM.R大部分黑、部分白条。</p>
+<p>不要整头先刷白再靠压强度补救。也不要把每个最终高光像素都画死：这张图控制允许区，最终位置还由HN与动态参数决定。</p>
+<h4 id="HM-G：局部二分偏移"><a href="#HM-G：局部二分偏移" class="headerlink" title="HM.G：局部二分偏移"></a>HM.G：局部二分偏移</h4><p>初稿可以先0，通过全局阴影偏移获得整体结果；再按发束修局部偏移。当前贡献约为G*0.1，原图常见底值约65～82但有区域变化。它不是一张“黑是阴影、白是亮面”的最终二分遮罩，不能直接把烘焙阴影塞进去期待固定边界。</p>
+<h4 id="HM-B：局部高光曲线形状"><a href="#HM-B：局部高光曲线形状" class="headerlink" title="HM.B：局部高光曲线形状"></a>HM.B：局部高光曲线形状</h4><p>初稿0可以参考原后发；原刘海有局部变化。先挑一束发做0、中灰、白的对照，观察与宽度&#x2F;凸起强度共同作用的方向，然后再画全头。它不是常规粗糙度，当前宽度运算也不是简单白&#x3D;宽。</p>
+<h4 id="HN-G：高光输入场"><a href="#HN-G：高光输入场" class="headerlink" title="HN.G：高光输入场"></a>HN.G：高光输入场</h4><p>从每束发的连续灰度场开始，可以先用根到梢0～1的梯度，或根据想让亮带绕过的位置弯曲梯度。把灰度写入G，其他当前未用通道可常量。</p>
+<p>一个好用的工作办法是先画几条“同值线”：比如希望当前亮带经过的各发束位置都约G&#x3D;0.5，然后分别向两侧渐变。这样跨发束的位置容易对齐。0.5本身不是永远亮的位置，实际亮带还要用偏移&#x2F;宽度调到它。</p>
+<p>先单色高光，看范围、位置和运动，再回渐变模式。发束高光断了先查HN.G连续性与HM.R；高光整体位置错先改偏移或输入场。原HN为256²，原HM为2K，说明位置场和精细允许区可以用不同尺寸但同一UV。</p>
+<h4 id="Hair-Bangs-FTM"><a href="#Hair-Bangs-FTM" class="headerlink" title="Hair&#x2F;Bangs_FTM"></a>Hair&#x2F;Bangs_FTM</h4><p>R画发片的保留形状与柔边：白实体、黑去掉、灰过渡。刘海眼透&#x2F;折射要在实际NPR链检查；它没有因FTM画好就自动完成。实体后发没有空间变化需求时可用常量代替这一文件。</p>
+<h4 id="HR色带"><a href="#HR色带" class="headerlink" title="HR色带"></a>HR色带</h4><p>可以先复用原512×4色带。要自己做，沿横向画所需的高光颜色变化，少用过多互相冲突的色段；若只用一行风格，四行可保持一致。原模块还允许选择RampY轴，需要多行效果时再明确每行对应哪套配色。</p>
+<p>调范围先单色，调配色再HR；避免因颜色太深误判HM&#x2F;HN没起作用。</p>
+<p><a id="make-9"></a></p>
+<h3 id="9-眼睛适配与提亮实操"><a href="#9-眼睛适配与提亮实操" class="headerlink" title="9. 眼睛适配与提亮实操"></a>9. 眼睛适配与提亮实操</h3><p>这一节以这次接入的自用头部为例。眼睛颜色原本在 <code>Head.png</code> 的左下角，模型还带独立高光片。最后继续使用原颜色图，补了一张HET和一套专用UV，并调整了独立眼睛材质。<strong>没有重画虹膜，也没有增加整场灯光或修改共享shader源码。</strong></p>
+<p>如果你只想先使用已经改好的工程，依次看9.1的材质槽、9.7的参数表和9.9的检查顺序；想自己复现，再看中间的UV和节点接线。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/10-eye-first-adaptation.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/10-eye-first-adaptation.png" alt="首次眼睛适配的正面记录，虹膜Value为1，几何高光已修正" width="900" height="902" loading="lazy" decoding="async"></a>
+<figcaption>首次适配记录：颜色图已经对上，几何高光已修正，虹膜亮度Value仍为1。下文继续解决虹膜整体不够亮的问题。</figcaption>
+</figure>
+
+<h4 id="9-1-先找到真正的眼睛面和材质槽"><a href="#9-1-先找到真正的眼睛面和材质槽" class="headerlink" title="9.1 先找到真正的眼睛面和材质槽"></a>9.1 先找到真正的眼睛面和材质槽</h4><p>这个模型的对象叫 <code>eyebrow</code>，但它同时包含虹膜、眉睫和高光片。对象名不能代替检查实际面。</p>
+<p><strong>在Blender里操作：</strong> 选中该对象，打开「材质属性」，逐个切换材质槽；需要确认分区时，进入编辑模式，取消全选，再使用该槽的「选择」按钮。结束后回到物体模式。只复制、替换对应部位的材质，避免整对象的三个槽都换成虹膜材质。</p>
+<table>
+<thead>
+<tr>
+<th>槽</th>
+<th>这次对应的面</th>
+<th>最终材质</th>
+<th>调整职责</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>两只虹膜，共192个面</td>
+<td>Ho_自用眼睛_心月狐</td>
+<td>颜色、视差、节点高光、阴影最低亮度</td>
+</tr>
+<tr>
+<td>1</td>
+<td>眉毛、睫毛等，共938个面</td>
+<td>MI_EYEbrow_01</td>
+<td>本次保留原材质</td>
+</tr>
+<tr>
+<td>2</td>
+<td>眼睛高光片，共200个面</td>
+<td>Ho_自用眼睛_几何高光</td>
+<td>高光片的颜色、透明度和亮度</td>
+</tr>
+</tbody></table>
+<p>虹膜使用心月狐眼睛材质的独立副本；高光片也单独复制材质。之后调整自己的角色时，共享的原角色材质仍可保留。</p>
+<h4 id="9-2-为什么换了颜色图，还需要适配UV"><a href="#9-2-为什么换了颜色图，还需要适配UV" class="headerlink" title="9.2 为什么换了颜色图，还需要适配UV"></a>9.2 为什么换了颜色图，还需要适配UV</h4><p>有两种不同坐标：<strong>图集UV告诉颜色图「眼睛画在哪里」；特效UV告诉视差和点高光「眼睛中心在哪里」。</strong></p>
+<p>这次 <code>UVMap</code> 的虹膜范围约为U&#x3D;0.0197～0.2879、V&#x3D;0.0057～0.2727，属于头部图集的一小块。模板的点高光、局部视差处理需要与0～1眼睛区域及其中心约定配合。直接让两条支路都用图集角落坐标，高光位置和位移比例就可能不合适。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/08-eye-uv.svg" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/08-eye-uv.svg" alt="头部图集UV与0到1眼睛特效UV分开使用，视差位移缩放回原图集的流程" width="1320" height="860" loading="lazy" decoding="async"></a>
+<figcaption>颜色图留在原图集；眼睛特效用独立坐标。示意图的圆和方框说明坐标关系，不表示真实UV拓扑。</figcaption>
+</figure>
+
+<p><strong>这次怎样准备：</strong> 检查发现，原有 <code>UV1</code> 的虹膜部分已经铺到接近0～1，并能与图集UV建立稳定对应关系。因此复制为 <code>Ho_EyeUV</code>，没有重新展开。原 <code>UVMap</code>、<code>EXTRAUV0</code>、<code>UV1</code> 的坐标均保留；活动与渲染UV继续是 <code>UVMap</code>。</p>
+<p><strong>自己的模型怎样做：</strong> 在「物体数据属性 → UV贴图」里先检查各层的用途，切到UV编辑器只看虹膜面。如果已有一层合适的眼睛展开，可以复制并明确命名；没有就为虹膜创建专用层，让虹膜中心落在约(0.5,0.5)，检查瞳孔中心、左右眼朝向和棋盘格拉伸，再将眼睛范围安排到0～1。需要左右不同图案时，不要让两只眼睛无条件重叠。</p>
+<p>不能见到层名 <code>UV1</code> 就直接复制使用。心月狐的衣服等部位把UV1当描边法线编码；别的模型也可能把它用于其他数据。<strong>这里复用的是经检查适合眼睛展开的坐标，不是「UV1总能当眼睛UV」的规则。</strong> 新增层只供眼睛特效读取，眉睫、颜色图和高光片仍按原图集采样。</p>
+<h4 id="9-3-视差怎样回到头部颜色图"><a href="#9-3-视差怎样回到头部颜色图" class="headerlink" title="9.3 视差怎样回到头部颜色图"></a>9.3 视差怎样回到头部颜色图</h4><p>在着色器编辑器，指定一个「UV贴图」节点读取 <code>Ho_EyeUV</code>，送进 <code>Parallax</code>；另一个「UV贴图」节点读取 <code>UVMap</code>。这次用下式把特效位移转换回颜色图的尺度：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">q = 专用眼睛UV</span><br><span class="line">q_shift = clamp(Parallax(q), 0, 1)</span><br><span class="line">delta = q_shift - q</span><br><span class="line">采样Head.png的UV = 原UVMap + delta × (0.270023, 0.270023)</span><br></pre></td></tr></table></figure>
+
+<p>0.270023是这次模型两套坐标的实际对应比例，不是其他模型都该照抄的常量。专用UV上的位移要按图集占用大小缩放，否则会移到脸、耳朵等其他图案。这里的限制范围保护约定的眼睛方形区域；UV岛周围仍应有合适扩边，并转视角检查边缘。</p>
+<p><strong>手动复现的节点顺序：</strong> <code>Parallax → 矢量运算「最大值」(0) →「最小值」(1) →「减去」专用UV →「相乘」图集比例 →「相加」原UVMap → 颜色纹理Vector</code>。所有节点放在自己的材质副本里；眼睛高光组的UV入口直接接 <code>Ho_EyeUV</code>。</p>
+<p>先将 <code>Parallax / Scale</code> 设为0，确认眼睛中心与颜色对齐，再逐渐加到这次的0.025。旋转视口看瞳孔位移；如果转动时读到眼睛外的图案，先核对坐标与比例。大尺度视差也可能破坏虹膜边缘，不应靠不断增加Scale来获得亮度。</p>
+<h4 id="9-4-HET怎样做，为什么没有另外画一张Eye-D"><a href="#9-4-HET怎样做，为什么没有另外画一张Eye-D" class="headerlink" title="9.4 HET怎样做，为什么没有另外画一张Eye_D"></a>9.4 HET怎样做，为什么没有另外画一张Eye_D</h4><p>这次新增 <code>Head_Eye_HET_Ho.png</code>，为1024²灰度遮罩：图集中需要调色的虹膜区域白，外围黑，边缘做适量过渡。它与 <code>Head.png</code> 使用同一套图集位置，由 <code>UVMap</code> 采样。分辨率可以不同，坐标对应必须一致。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/12-eye-het-mask.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/12-eye-het-mask.png" alt="本案例HET遮罩，白色虹膜调色区位于图集左下角，其余为黑色" width="1024" height="1024" loading="lazy" decoding="async"></a>
+<figcaption>本案例真实HET。白块位于左下角是因为眼睛画在这个图集区域；它属于这一套UV，不能直接贴到另一张头上。</figcaption>
+</figure>
+
+<p><strong>自己绘制：</strong> 导出或显示图集UV作参考，黑底新建一层，在希望调色的虹膜位置画白；瞳孔是否一起调色按目标决定，眼白及其他不希望改变的区域保留黑。把灰度写入RGB，Alpha可保留白。按此模板的眼睛HET入口使用sRGB，再连接到 <code>Hue/Saturation/Value</code> 的Factor。灰色表示两种结果混合；Factor不等于灯光强度。</p>
+<p>当Hue&#x3D;0.5、Saturation&#x3D;1、Value&#x3D;1时，即使HET是白也不会自动提亮。白色只是允许这一片采用调色后的结果。Face_HET用于眼透控制，不能拿它代替眼睛局部调色遮罩。</p>
+<p>原 <code>Head.png</code> 的虹膜颜色和中心已适合这个模型，处理采样与材质后可以继续使用。<strong>需要单独Eye_D的情况：</strong> 原图分辨率不足、虹膜设计要重画、图集边缘难留扩边，或希望以后独立更换眼睛。</p>
+<p>要拆成独立图，可以复制原文件并按目标眼睛UV重新输出虹膜区域，让独立Eye_D与0～1专用UV对应，再修改其颜色采样接线。单纯裁出一个方块并不能保证原模型坐标正确；本案例的两套UV已经有对应关系，其他模型要重新核对。最后记录颜色图、HET、专用UV各使用哪套坐标。</p>
+<h4 id="9-5-先分清三种高光，才知道该调哪里"><a href="#9-5-先分清三种高光，才知道该调哪里" class="headerlink" title="9.5 先分清三种高光，才知道该调哪里"></a>9.5 先分清三种高光，才知道该调哪里</h4><table>
+<thead>
+<tr>
+<th>高光来源</th>
+<th>你在哪里找</th>
+<th>会怎样变化</th>
+<th>制作与调整方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>画在D里的亮斑</td>
+<td>打开颜色图就能看到</td>
+<td>随表面与纹理采样，图案本身固定</td>
+<td>在绘画源文件调形状与颜色；固定大亮斑要为其他高光留余量</td>
+</tr>
+<tr>
+<td>节点生成的高光</td>
+<td>虹膜材质的「眼睛高光」组</td>
+<td>受特效UV、视差、参数和时间接线影响</td>
+<td>调细节&#x2F;点高光强度、大小、位移；EM资源继续提供素材</td>
+</tr>
+<tr>
+<td>模型上的高光片</td>
+<td>编辑模式选择材质槽2的面</td>
+<td>随几何遮挡和自己的材质受光变化</td>
+<td>调高光片材质，必要时再改几何位置和形状</td>
+</tr>
+</tbody></table>
+<p>这次颜色图已经画有高光，模型也有高光片，因此另外一套节点高光使用适中的强度。发现双重亮点时，可以暂将节点的细节与点高光强度设为0：仍然可见的亮点继续从D或高光片里找。</p>
+<p><code>T_HDMF_EM.png</code>继续复用模板资源，它提供视差&#x2F;高光素材。把自己的Eye_D放进这个入口，并不能让模板自动从普通虹膜绘画里得到正确高度。做新的特效素材前，应先弄清闭包里各通道和各采样区域的用途。</p>
+<h4 id="9-6-高光片发灰：这次具体改了什么"><a href="#9-6-高光片发灰：这次具体改了什么" class="headerlink" title="9.6 高光片发灰：这次具体改了什么"></a>9.6 高光片发灰：这次具体改了什么</h4><p>本模型原 <code>MI_HighLight_01</code> 使用原理化BSDF，金属度&#x3D;1、粗糙度&#x3D;1。对这块想持续显示亮色的小高光片，原设置让它在某些视角显得发灰。金属度和粗糙度不是通用的「眼睛更亮」开关。</p>
+<p>这次复制成 <code>Ho_自用眼睛_几何高光</code>，保留颜色图、UV、Alpha和原有透明设置；颜色图Color改接 <code>Emission Color</code>，<code>Emission Strength</code>为1，基础色改黑、金属度改0、Specular IOR Level改0。这样由贴图颜色控制高光片的亮色，减少它被普通受光结果压暗的情况。</p>
+<p><strong>你操作的位置：</strong> 切换到槽2的独立材质，在着色器编辑器找到原理化BSDF及图像纹理，核对上述连接与参数。想弱一点，降低Emission Strength；想改变形状，在高光片几何或其颜色&#x2F;透明图上调整。此做法用于风格化高光片，普通虹膜和眉睫仍用各自材质。Alpha有连线还需要与该材质的透明设置配合，新材质不能只连Alpha就假定透明已经正确。</p>
+<h4 id="9-7-虹膜不亮：这次增加的最低亮度"><a href="#9-7-虹膜不亮：这次增加的最低亮度" class="headerlink" title="9.7 虹膜不亮：这次增加的最低亮度"></a>9.7 虹膜不亮：这次增加的最低亮度</h4><p>第一次适配时，为了保留原图颜色，将模板HSV的Value从2降到1，同时保留了模板较暗的阴影设置。颜色已经接对，阴影仍会压暗虹膜；只把白色高光点加亮，也不能改善虹膜整体颜色。</p>
+<p>后来把Value设为1.8，细节高光从0.10调至0.22、点高光从0.20调至0.40，并新增一个名为「眼睛提亮：阴影保底与总亮度」的节点框。这是独立眼睛材质的新增功能，可手动用两枚矢量运算节点复现。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/09-eye-brightness.svg" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/09-eye-brightness.svg" alt="原色带高光乘最低亮度系数，与光照后颜色逐分量取最大值，再由HET控制HSV提亮" width="1320" height="810" loading="lazy" decoding="async"></a>
+<figcaption>保留光照结果，同时为虹膜设置可调的颜色下限。HET继续决定哪些位置接受HSV调色。</figcaption>
+</figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">最低颜色 = 带节点高光的原色 × 0.55</span><br><span class="line">保底结果 = max(光照后颜色, 最低颜色)</span><br><span class="line">最终颜色 = 用HET作Factor的HSV调色(保底结果，Value=1.8)</span><br></pre></td></tr></table></figure>
+
+<p>这里的max按RGB三个分量分别比较。0.55是线性着色颜色的系数，不是「屏幕亮度55%」。HET白色区域在Value&#x3D;1.8时，最低颜色也继续乘亮度倍率；灰色区域只混合部分调色效果。用带颜色的原色作下限，能保留暗瞳孔和虹膜纹样，比给整只眼睛添加固定白色更容易控制。</p>
+<p><strong>手动接线：</strong> 从「眼睛高光」组输出分一条线，接矢量运算「缩放」，Scale填0.55；原「多光源合成」输出和这个缩放结果，分别接另一枚矢量运算「最大值」的两个Vector；最大值输出接 <code>Hue/Saturation/Value / Color</code>。原HET接Factor、HSV输出接材质输出的关系继续保留。原有光照和共享高光组内部无需修改。</p>
+<p>最低亮度是一项风格化颜色修正。它让阴影里的眼睛更清楚，不会直接提高整场曝光、照亮周围物体或自动生成泛光。想要眼睛周围的光晕，需要另查工程的后期流程。</p>
+<p><a id="eye-controls"></a></p>
+<p><strong>已经改好的工程：</strong> 选 <code>eyebrow</code> → 材质槽0 → 着色器编辑器。当前控制如下。</p>
+<table>
+<thead>
+<tr>
+<th>调整入口</th>
+<th align="right">当前值</th>
+<th>调大后看到什么</th>
+<th>建议先怎样试</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Hue&#x2F;Saturation&#x2F;Value &#x2F; Value</td>
+<td align="right">1.8</td>
+<td>HET允许区域更亮，过大可能丢失虹膜细节</td>
+<td>太亮先降至1.5～1.6</td>
+</tr>
+<tr>
+<td>矢量运算.005 &#x2F; Scale</td>
+<td align="right">0.55</td>
+<td>阴影中的最低颜色更亮</td>
+<td>阴影里太亮降至0.35；0关闭保底</td>
+</tr>
+<tr>
+<td>Group.002 &#x2F; 细节高光强度</td>
+<td align="right">0.22</td>
+<td>模板细节高光更明显</td>
+<td>从0开始增加，检查与手绘亮斑是否叠加过强</td>
+</tr>
+<tr>
+<td>Group.002 &#x2F; 点高光强度</td>
+<td align="right">0.40</td>
+<td>模板点高光更明显</td>
+<td>暂设0可区分其他高光来源</td>
+</tr>
+<tr>
+<td>Group.002 &#x2F; 点高光大小</td>
+<td align="right">0.035</td>
+<td>改变模板点高光的尺寸</td>
+<td>先固定强度，再小幅调尺寸</td>
+</tr>
+<tr>
+<td>Group.002 &#x2F; 点高光位移</td>
+<td align="right">X&#x3D;0.19，Y&#x3D;-0.14</td>
+<td>改变模板点高光的位置</td>
+<td>转视角确认高光仍在虹膜合适位置</td>
+</tr>
+<tr>
+<td>Parallax &#x2F; Scale</td>
+<td align="right">0.025</td>
+<td>虹膜纹理的视差位移更强</td>
+<td>先0确认UV，再逐步增加</td>
+</tr>
+<tr>
+<td>槽2的原理化BSDF &#x2F; Emission Strength</td>
+<td align="right">1</td>
+<td>几何高光片更亮</td>
+<td>单独调它，不影响虹膜整体亮度</td>
+</tr>
+</tbody></table>
+<p>节点名属于这份生成的材质；自己搭建时编号可能不同，以节点类型、所在框和实际接线识别。点高光旋转仍由时间接线控制，静止画面也要核对当前帧。</p>
+<h4 id="9-8-给自己的新眼睛图怎样绘制"><a href="#9-8-给自己的新眼睛图怎样绘制" class="headerlink" title="9.8 给自己的新眼睛图怎样绘制"></a>9.8 给自己的新眼睛图怎样绘制</h4><ol>
+<li><strong>先做灰度结构。</strong> 确定瞳孔中心、虹膜边缘、上深下浅的层次；放到模型上检查大小与变形，再细化。画死的阴影越强，之后用灯光和最低亮度能调整的余量越少。</li>
+<li><strong>再做虹膜颜色。</strong> 分开保存主体色、放射纹、内圈与外圈等绘画层。先让瞳孔与虹膜可辨，再增加细节；不用一开始把白色大高光画满。</li>
+<li><strong>决定固定与动态高光的分工。</strong> 保留哪些手绘亮斑、哪些交给节点、是否使用模型高光片，先选清楚。三套都很强会让眼睛下半部或亮点过曝。</li>
+<li><strong>制作独立HET。</strong> 对应颜色图坐标画允许调色区；想保持眼白、某些图案或瞳孔颜色时，将这些区域排除。无需为同一功能再画一张没有接线的遮罩。</li>
+<li><strong>整理边缘和扩边。</strong> 确认过滤、缩小和小幅视差时，边缘不会读到图集里其他部位。检查UV、特效图和眼球曲面法线；不要让极小或退化UV面承担主要视差方向。</li>
+</ol>
+<p>本案例没有新增虹膜法线图，继续使用模板的法线输入设置和网格已有法线。颜色图、HET、特效UV以及模板EM资源职责不同，补一张图前先确认要补的是哪种数据。</p>
+<h4 id="9-9-每次接新眼睛，按这个顺序检查"><a href="#9-9-每次接新眼睛，按这个顺序检查" class="headerlink" title="9.9 每次接新眼睛，按这个顺序检查"></a>9.9 每次接新眼睛，按这个顺序检查</h4><table>
+<thead>
+<tr>
+<th>看到的问题</th>
+<th>先检查</th>
+<th>修改后怎样确认</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>眼睛读到脸或耳朵图案</td>
+<td>图集UV、显式UV层引用和图片Vector</td>
+<td>视差Scale&#x3D;0先看对齐，再旋转视口</td>
+</tr>
+<tr>
+<td>眼睛中心对，但动态高光偏到旁边</td>
+<td>专用UV中心、方向、点高光位移</td>
+<td>暂减其他高光，再看正面及左右斜视</td>
+</tr>
+<tr>
+<td>只有小亮点，虹膜整体发暗</td>
+<td>HSV Value、HET范围、主光阴影与最低亮度</td>
+<td>保持同一灯光和曝光，分别调总亮度与阴影下限</td>
+</tr>
+<tr>
+<td>高光片发灰</td>
+<td>选槽2确认几何范围，检查金属度、粗糙度和颜色&#x2F;发光连接</td>
+<td>单独比较高光片，正面和侧面都看</td>
+</tr>
+<tr>
+<td>虹膜过白，瞳孔或纹样看不清</td>
+<td>HSV、最低亮度、三类高光叠加</td>
+<td>降总亮度，再逐个恢复高光来源</td>
+</tr>
+<tr>
+<td>转头时有接缝或明显拉伸</td>
+<td>UV方向与拉伸、扩边、视差Scale和曲面法线</td>
+<td>正面、左右侧面、靠近与远离分别检查</td>
+</tr>
+</tbody></table>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/11-eye-brightened-side.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/11-eye-brightened-side.png" alt="虹膜提亮后的35度斜侧渲染视口记录，阴影区域仍保留粉红虹膜和高光" width="900" height="572" loading="lazy" decoding="async"></a>
+<figcaption>提亮后的35°斜侧视口记录。与本节开头的首次适配图采用不同视角和灯光状态，两图用于记录阶段效果，不是严格的同条件A/B亮度对照。已检查正面与斜侧视口；截图不代表最终相机渲染。</figcaption>
+</figure>
+
+<p>这次可以归纳成四项可复用的操作：<strong>复制独立材质 → 为眼睛特效准备合适UV → 分别调整虹膜和高光片 → 转视角验证后记录参数。</strong> 已有足够的颜色图时，先检查采样和光照；需要独立Eye_D时，再按目标UV输出或重画。</p>
+<p>操作前保留原材质、网格UV和可编辑绘画文件。新增UV、材质副本和打包图片只有随工程保存才会长期保留；这次调整时没有自动保存或覆盖原 <code>.blend</code>。</p>
+<p><a id="make-10"></a></p>
+<h3 id="10-Up-FX与尾巴附加图"><a href="#10-Up-FX与尾巴附加图" class="headerlink" title="10. Up_FX与尾巴附加图"></a>10. Up_FX与尾巴附加图</h3><h4 id="Up-FX"><a href="#Up-FX" class="headerlink" title="Up_FX"></a>Up_FX</h4><p>RGB制作流动亮纹&#x2F;噪声素材，Alpha按衣服UV画允许显示范围。当前RGB经运动UV采样，Alpha用原UV遮罩：设计时可让流动图案较通用，但Alpha必须落在自己的衣服区域。先固定时间看遮罩，再播放看移动是否越界。它与D.Alpha的发光编码是两个入口。</p>
+<h4 id="Tail-D与Tail-ID"><a href="#Tail-D与Tail-ID" class="headerlink" title="Tail_D与Tail_ID"></a>Tail_D与Tail_ID</h4><p>Tail_D画根尖毛色、条纹及适量手绘细节；内部还有图像闭包读D，换图时两处都换。Tail_ID当前主要取R参与局部不透明度，按尾巴实际UV画毛片保留轮廓，黑空白留、必要处灰。</p>
+<h4 id="Tail-RGID与角色-M"><a href="#Tail-RGID与角色-M" class="headerlink" title="Tail_RGID与角色_M"></a>Tail_RGID与角色_M</h4><p>Tail_RGID按尾巴分支需要编号，原常见1&#x2F;4等低灰度，解码位置与衣服不同。角色_M实际读Alpha，采样UV2：先决定毛片&#x2F;区域在UV2中的遮罩布局，再画羽状&#x2F;毛束轮廓渐变等目标范围。不能只把Tail_D的UV岛复制过来而不核对M。</p>
+<h4 id="FurHeight与Flow"><a href="#FurHeight与Flow" class="headerlink" title="FurHeight与Flow"></a>FurHeight与Flow</h4><p>通用FurHeight是毛纹高度&#x2F;可见性素材，可以先复用；自制时用适合疏密的点&#x2F;毛纹和灰度高度变化，再与layer一起检查，不能把它当单层模型直接长毛的图片。</p>
+<p>当前Flow映射RGB到-1～1后扰动毛纹UV，幅度随层值变化，可以先复用。制作自己的图时，先看它在当前入口读取后的数值，再设计方向扰动。原Flow图片设为sRGB，因此原入口里字节128不等于线性0.5；若要线性中性0.5，sRGB字节约188。不能既沿用原色彩空间，又把普通数据图的128中性值直接套进去。</p>
+<p>普通尾巴入门先处理D&#x2F;必要透明；体积毛另需几何和属性，不能仅凭图数判断已完整设置。</p>
+<figure>
+<a href="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" target="_blank" rel="noopener"><img src="/img/xin-yue-hu-texture-model-guide/06-normals-uv.png" alt="表面法线、描边方向与UV0至UV3的用途" width="1600" height="1000" loading="lazy" decoding="async"></a>
+<figcaption>依据当前接线说明模型数据；UV1是方向编码（点击图片查看大图）</figcaption>
+</figure>
+
+<p><a id="make-11"></a></p>
+<h3 id="11-模型法线：四种相关数据怎样区分"><a href="#11-模型法线：四种相关数据怎样区分" class="headerlink" title="11. 模型法线：四种相关数据怎样区分"></a>11. 模型法线：四种相关数据怎样区分</h3><table>
+<thead>
+<tr>
+<th>数据</th>
+<th>储存位置</th>
+<th>负责什么</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>几何面法线</td>
+<td>模型拓扑&#x2F;面朝向</td>
+<td>判断正反面、基础几何方向</td>
+</tr>
+<tr>
+<td>平滑&#x2F;分裂&#x2F;自定义着色法线</td>
+<td>模型每个面角</td>
+<td>大形体的受光、阴影、边缘光、法线贴图的基础</td>
+</tr>
+<tr>
+<td>切线法线贴图</td>
+<td>N的RG，经转换</td>
+<td>褶皱、缝线等局部表面细节</td>
+</tr>
+<tr>
+<td>描边外扩法线</td>
+<td>本工程UV1编码，经解码</td>
+<td>描边壳外扩方向，避免不想要的裂缝&#x2F;尖角</td>
+</tr>
+</tbody></table>
+<p>HN是头发高光输入场，不属于上表的普通N法线贴图。</p>
+<h4 id="几何与着色法线的制作"><a href="#几何与着色法线的制作" class="headerlink" title="几何与着色法线的制作"></a>几何与着色法线的制作</h4><p>先检查面朝向，修正明显反面、重复面和无意重合。需要双面的薄片不因此把整个模型随机翻面；应按薄片材质&#x2F;实际拓扑设计处理。</p>
+<p>衣服大曲面先平滑，金属或结构折角按设计保留硬边。细小褶皱可放N，轮廓与大的结构变化靠模型。Weighted Normal等适合的法线调整可用于某些硬表面，但不应全角色无差别套用。</p>
+<p>脸部可从正常平滑开始，鼻尖、嘴角、眼窝的错误二分若来自着色法线再局部调整。需要特殊二次元法线时，可用形状合适的光滑参考体传递大方向，再修正不合理区域；不是统一把全部脸法线设成向前。SDF负责主脸影形状，但法线仍可能影响边缘光等其他链。</p>
+<p>头发可在每束发内获得连续的大方向，减少不需要的多边形碎亮；相邻但空间分离的发层不能不分组地全部平均。需要在发束间连贯时，可用合适参考形状转移并保留边界。</p>
+<p>心月狐八个原部位当前都带自定义法线，导入后要保留&#x2F;核对，不要先“重算法线清空全部”再期待原效果。<code>custom_normal</code>是当前网格上的内部自定义法线存储，不是要求你画一张同名图片，也不能直接当UV1数据复制。</p>
+<h4 id="切线和副切线"><a href="#切线和副切线" class="headerlink" title="切线和副切线"></a>切线和副切线</h4><p>切线建立纹理UV方向与模型表面的关系。当前GGX高光的默认切线明确来自UV0，普通Normal Map使用其对应的纹理切线基础。因此UV0的旋转、镜像、接缝和退化岛都可能影响方向性高光&#x2F;法线。</p>
+<p>切线通常由模型法线、UV和拓扑计算，不是另外画一张图。烘焙和导出使用一致的基础；镜像UV需要正确手性，不把不同面角的切线强行合成一个顶点方向。UV面积几乎为零的面不适合作为可靠切线基础。</p>
+<p><a id="make-12"></a></p>
+<h3 id="12-UV0-UV1-UV2-UV3各自怎样准备"><a href="#12-UV0-UV1-UV2-UV3各自怎样准备" class="headerlink" title="12. UV0&#x2F;UV1&#x2F;UV2&#x2F;UV3各自怎样准备"></a>12. UV0&#x2F;UV1&#x2F;UV2&#x2F;UV3各自怎样准备</h3><table>
+<thead>
+<tr>
+<th>层</th>
+<th>心月狐当前用途</th>
+<th>制作方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>UV0</td>
+<td>原八部位活动渲染UV；主贴图采样、GGX默认切线</td>
+<td>正常展开、整理岛、画图与烘焙</td>
+</tr>
+<tr>
+<td>UV1</td>
+<td>描边组明确将它按八面体法线解码</td>
+<td>从描边方向计算并编码，不是普通Unwrap&#x2F;Pack</td>
+</tr>
+<tr>
+<td>UV2</td>
+<td>尾巴M.Alpha采样和沿V的效果渐变</td>
+<td>按遮罩图集&#x2F;根梢渐变要求安排第二套纹理坐标</td>
+</tr>
+<tr>
+<td>UV3</td>
+<td>原模型有数据，但这次检查的有效节点没有发现明确显式读取</td>
+<td>保留原资产时不随意删；新角色当前无需为未知用途强做</td>
+</tr>
+</tbody></table>
+<p>命名和层序号是两件事。节点写<code>UV1</code>时按层名找；以后导出到别的软件&#x2F;Unity还要核对UV槽序号。这里的UV1没有被定义为烘焙灯光UV，不能照其他工程的命名习惯套用。</p>
+<h4 id="UV0制作原则"><a href="#UV0制作原则" class="headerlink" title="UV0制作原则"></a>UV0制作原则</h4><p>按图集分部位；主要可见区域给足面积、控制拉伸，检查棋盘格。脸保持可预测的左右关系以匹配SDF镜像；眼睛保持与模板采样对应的中心&#x2F;比例；头发便于沿束绘制连续控制场。</p>
+<p>镜像&#x2F;重叠能节省面积，但会共享图案、遮罩和法线数据；要不对称脸妆、头发高光或独立材质控制时留独立区域。岛间留满足最终尺寸&#x2F;缩小过滤的间距与扩边，不能只看大图中没有重叠。</p>
+<p>复制给其他槽之前先弄清用途。检查显示Cloth&#x2F;Up&#x2F;Tail等的UV2并非整体等于UV0；不能因为几个采样点一样就判断整层可替换。</p>
+<h4 id="UV1描边编码的完整思路"><a href="#UV1描边编码的完整思路" class="headerlink" title="UV1描边编码的完整思路"></a>UV1描边编码的完整思路</h4><p>当前真实路径：<code>UV1 → 八面体解码 → n*0.5+0.5 → Tangent Normal Map → 外扩</code>。所以给新模型制作时，目标方向需要适配这条切线空间路径；把对象空间平滑法线直接编码进去通常会被再次当切线法线变换。</p>
+<ol>
+<li>先确定想要的描边外扩方向。可以从同一结构内连续的平滑法线开始；硬边附近可共享更平顺的外扩方向，但彼此贴近的衣层&#x2F;发层不能全部焊在一起平均。</li>
+<li>保留渲染低模实际的分裂&#x2F;自定义法线；确定UV0和三角化基础。</li>
+<li>对每个面角取得UV0对应的切线T、副切线B和着色法线N，将目标对象空间描边方向转成切线坐标 <code>(dot(D,T), dot(D,B), dot(D,N))</code> 并归一化。切线手性要匹配渲染器。</li>
+<li>将三分量方向做八面体压缩得到二维p；当前解码起点是 <code>f=UV1-(0,1)</code>，所以相应保存U&#x3D;p.x、V&#x3D;p.y+1。它不是常规将p整体映射到0～1的另一种打包约定。</li>
+<li>写入名为UV1的每面角数据。镜像岛、硬边和不同切线基础的角可以有不同编码，不能只按顶点编号写一个值。</li>
+<li>解码后与目标方向比较，再在实际描边中看裂缝、尖角、凹陷与距离变化。根据效果修平滑分组和COL0.G，不能只验证“存在UV1”。</li>
+</ol>
+<p>Cloth当前实测UV1约U&#x3D;-0.9985～0.9961、V&#x3D;0.0107～1.9829，与上面的代码一致。GLSL注释写过0～1，但实际代码和资产值不按那个注释范围；不要做归一化Pack。原Eye的UV1数据分布不同，不能只凭同名就断言所有部位都已经使用同一种美术编码，应按该部位是否需要描边独立核对。</p>
+<p>这通常通过预处理脚本&#x2F;工具生成，不是模型师手动拖几万个UV点。这里说明的是适配思路；使用生成工具后仍须核对解码与实际外扩效果。</p>
+<h4 id="UV2制作原则"><a href="#UV2制作原则" class="headerlink" title="UV2制作原则"></a>UV2制作原则</h4><p>对尾巴M的遮罩，将需要共用的轮廓组织到对应岛位；沿V还用于渐变，因此让相应区域的V方向与想要的根梢&#x2F;效果变化一致。先显示M.Alpha，再显示纯V渐变，分别验证图案位置和渐变方向。</p>
+<p>普通衣服&#x2F;脸&#x2F;头发的主图片没有因此全改读UV2，新角色不必每个部位都强制展开另一套遮罩UV。</p>
+<p><a id="make-13"></a></p>
+<h3 id="13-COL0、透明修正、ID、毛层属性怎样做"><a href="#13-COL0、透明修正、ID、毛层属性怎样做" class="headerlink" title="13. COL0、透明修正、ID、毛层属性怎样做"></a>13. COL0、透明修正、ID、毛层属性怎样做</h3><h4 id="COL0顶点色"><a href="#COL0顶点色" class="headerlink" title="COL0顶点色"></a>COL0顶点色</h4><p>原八部位都有CORNER域BYTE_COLOR的COL0。它是网格数据，不需要另外一张PNG。</p>
+<p>描边取G并经过约0.4645次幂后乘宽度：G越低越细，0为零宽度贡献；1为满贡献。先给需要的区域合理统一底值，在发尖、小饰品、内侧等位置按设计降低；高密度区域可柔和过渡，低模顶点少时很细的控制可能需要增加合适拓扑或接受插值。</p>
+<p>脸根材质的顶点色B还控制不同边缘光链：其中一支读B，另一支读1-B。因此B不能随手整头填白然后认为所有效果都保持中性；要按想保留的边缘光预览后调整。当前脸节点层名为空，还要确认实际活动颜色层，创建一个COL0不代表它立刻成为被读取的层。</p>
+<p>R&#x2F;A在不同资产或功能里可能保留其他信息，这次检查未确认全角色统一用途；不要为了画G而把其他通道全部覆盖。BYTE_COLOR还有颜色空间转换，8bit128不一定等于shader线性0.5，调宽度时以实际效果&#x2F;读取值为准。</p>
+<h4 id="描边排除"><a href="#描边排除" class="headerlink" title="描边排除"></a>描边排除</h4><p>当前读“描边排除”后在轮廓颜色与透明之间混合：0保留这一路描边、1走透明。可以在需要完全排除的区域提供同名0～1属性，而局部变细优先用COL0.G。</p>
+<h4 id="整数ID，和RGID图区别开"><a href="#整数ID，和RGID图区别开" class="headerlink" title="整数ID，和RGID图区别开"></a>整数ID，和RGID图区别开</h4><p>描边几何节点按来源写实例整数ID：头发&#x2F;刘海0、Cloth1、Up2、Down3、脸&#x2F;眼睛4，供外层描边材质选不同颜色和宽度。这是工程生成的模型&#x2F;实例属性，不是再画一张整数ID贴图。</p>
+<p>几何组还显式引用原对象。把自己的头赋上材质，并不会自动让那组Object Info读取自己的头；新角色需更新来源或建立自己的描边对象&#x2F;引用。这也是描边适配的一部分，不是贴图问题。</p>
+<h4 id="透明修正"><a href="#透明修正" class="headerlink" title="透明修正"></a>透明修正</h4><p>刘海NPR读取名为“透明修正”的顶点色，与FTM.R经曲线后的值做最大值。做此层时灰度RGB一致：黑让FTM继续决定，白将这条混合拉向头发不透明端；按实际区域调。</p>
+<p>当前原刘海基础网格只查到COL0，没有“透明修正”颜色层，不能把节点引用存在当成原资产一定提供了有效控制。需要这个功能时在自己的模型明确准备对应层并预览，不能盲目假定缺失层的回退值。</p>
+<h4 id="layer、sm-nor与毛"><a href="#layer、sm-nor与毛" class="headerlink" title="layer、sm_nor与毛"></a>layer、sm_nor与毛</h4><p>启用毛层时，layer表示各层相对位置；sm_nor给毛层使用的连续法线；“毛”控制普通表面&#x2F;毛层分支。它们应随毛层几何一起生成&#x2F;传递，不能只给单层模型手工全填一个layer就等于32层毛。</p>
+<p>现有“多层毛发”组会写layer和sm_nor，但这次检查的这个组未写“毛”，且尾巴修改器关闭。搭建自己的完整分支时，需要按实际材质读法补相应标记：普通表面与毛层可用0&#x2F;1区分，并验证分支。层数、总厚度和法线方向共同决定毛体积，贴图负责毛纹&#x2F;可见性。</p>
+<p><a id="make-14"></a></p>
+<h3 id="14-给自己新角色的一次练习任务"><a href="#14-给自己新角色的一次练习任务" class="headerlink" title="14. 给自己新角色的一次练习任务"></a>14. 给自己新角色的一次练习任务</h3><p>先选一块有凸缝、一个金属饰物和一处镂空的衣服：D画三者颜色，Alpha普通102；N用凸缝法线、A分别粗糙&#x2F;光滑；FTM用R控制镂空、G分金属；RGID为三块分配不同编号，预览选区。这样四张图的用途都能独立验证。</p>
+<p>再选三束相邻头发：HM.R画允许区，HM.G&#x2F;B先常量，HN.G画连续输入场，调出跨三束的连贯高光后转视角。不要第一步直接画完整头发后才找错误。</p>
+<p>脸接入符合当前解码的SDF，检查±60°鼻影，再试侧后方与转头；需要眼透时另做Face_HET。描边最后准备COL0.G和UV1，先验证一小块模型的编码&#x2F;外扩方向再扩到全角色。</p>
+<p>验收分三轮：第一轮颜色与UV，第二轮独立控制图与法线，第三轮动态灯光、视角、描边和透明。所有入口有效后，再增加流动FX与毛层。</p>
+<h2 id="使用时保留的记录"><a href="#使用时保留的记录" class="headerlink" title="使用时保留的记录"></a>使用时保留的记录</h2><p>保存可编辑颜色与独立控制图源文件，记录图集、分区编号、色彩空间和模型UV层名。对已经打包的PNG逐通道检查，而不是依靠文件浏览器的外观判断用途。</p>
+<p>本篇配图包括原纹理的通道诊断预览与根据接线绘制的计算说明图；缩略图用于理解数据，不作为可直接替换的角色纹理。制作方法给出可执行起点，但没有宣称恢复了原作者的全部烘焙工具与制作工艺。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>著者: </span><span class="post-copyright-info"><a href="https://dongyunmegumi.github.io">Dongyun Megumi</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>リンク: </span><span class="post-copyright-info"><a href="https://dongyunmegumi.github.io/2026/10/xin-yue-hu-texture-model-guide/">https://dongyunmegumi.github.io/2026/10/xin-yue-hu-texture-model-guide/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>著作権表示: </span><span class="post-copyright-info">このブログのすべての記事は、<a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> ライセンスの下で提供されており、特に明記されていない限り、すべての権利を留保します。転載時には出典を明記してください: <a href="https://dongyunmegumi.github.io">Dongyun Megumi</a>。</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Blender/">Blender</a><a class="post-meta__tags" href="/tags/%E8%A7%92%E8%89%B2%E6%9D%90%E8%B4%A8/">角色材质</a><a class="post-meta__tags" href="/tags/SDF/">SDF</a><a class="post-meta__tags" href="/tags/UV/">UV</a></div><div class="post-share"><div class="social-share" data-image="/img/xin-yue-hu-texture-model-guide/00-workflow.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"><img class="cover" src="/img/cover-alt.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">次へ</div><div class="info-item-2">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</div></div><div class="info-2"><div class="info-item-1">Blender 4.5 LTS を使っていて、特定の操作でクラッシュする問題に悩まされていました。原因を特定できたので、同じ問題に遭遇した人のためにメモを残します。 症状MACHIN3tools の特定のオペレーター実行後、Undo（Ctrl+Z）時に Blender がクラッシュする。 原因bm.clear() を呼び出した場合、ジオメトリデータはクリアされるが BMesh オブジェクト自体は解放されない。残った BMesh は Python のガベージコレクションに回収を任されるのですが、このとき C 側のポインタはすでに無効になっているため、GC が走った瞬間にダングリングポインタアクセスでクラッシュします。 解決策12345# ❌ 悪い例 — クラッシュの原因bm.clear()# ✅ 良い例 — メモリを確実に解放bm.free()  bm.clear() はジオメトリだけ消して BMesh を保持したい場合に使うもの。使い終わった BMesh は必ず bm.free() で解放しましょう。 まとめ   メソッド 動作 使いどころ    bm.clear() ジオメトリ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>関連記事</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました"><img class="cover" src="/img/cover-default.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-30</div><div class="info-item-2">はじめまして — 作品集ブログ始めました</div></div><div class="info-2"><div class="info-item-1">はじめまして、Dongyun Megumi です。 このブログは私の 3D創作作品集 として始めました。忘れられないように、うまくなりたい——いつか振り返ったときに、自分の成長の軌跡が残る場所にしたいです。 このブログで書くこと キャラクター制作の記録 — スカルプトからトポロジー、リギングまで WIP（Work in Progress） — 制作途中の絵や失敗の記録も含めて Blender &#x2F; Unity の学び — ハマった罠とその解決法 3Dアシストドローイング — 3D を下書きに使ったイラスト制作  使用ツール   用途 ツール    モデリング・スカルプト Blender &#x2F; ZBrush   テクスチャ Substance Painter   ゲームエンジン Unity   ペイント Clip Studio Paint   これからまずは現在進行中のキャラクタープロジェクトの制作過程から順番に投稿していく予定です。 よろしくお願いします。  大家好，我是 Dongyun Megumi。这个博客是我的 3D 创作作品集——用来记录角色制作的过程、W...</div></div></div></a><a class="pagination-related" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"><img class="cover" src="/img/cover-alt.png" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-30</div><div class="info-item-2">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</div></div><div class="info-2"><div class="info-item-1">Blender 4.5 LTS を使っていて、特定の操作でクラッシュする問題に悩まされていました。原因を特定できたので、同じ問題に遭遇した人のためにメモを残します。 症状MACHIN3tools の特定のオペレーター実行後、Undo（Ctrl+Z）時に Blender がクラッシュする。 原因bm.clear() を呼び出した場合、ジオメトリデータはクリアされるが BMesh オブジェクト自体は解放されない。残った BMesh は Python のガベージコレクションに回収を任されるのですが、このとき C 側のポインタはすでに無効になっているため、GC が走った瞬間にダングリングポインタアクセスでクラッシュします。 解決策12345# ❌ 悪い例 — クラッシュの原因bm.clear()# ✅ 良い例 — メモリを確実に解放bm.free()  bm.clear() はジオメトリだけ消して BMesh を保持したい場合に使うもの。使い終わった BMesh は必ず bm.free() で解放しましょう。 まとめ   メソッド 動作 使いどころ    bm.clear() ジオメトリ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Dongyun Megumi</div><div class="author-info-description">忘れられないように、うまくなりたい。主にCG、ペイント、ゲーム。最近はBlenderやUnity、3Dアシストドローイングなどを学ぶ。</div><div class="site-data"><a href="/archives/"><div class="headline">記事</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">タグ</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">カテゴリ</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://x.com/DongyunMegumi" target="_blank" title="X / Twitter"><i class="fab fa-x-twitter" style="color: #a992f0;"></i></a><a class="social-icon" href="https://github.com/DongyunMegumi" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #f0ecff;"></i></a><a class="social-icon" href="https://vgen.co/DongyunMegumi" target="_blank" title="VGen"><i class="fas fa-palette" style="color: #8b75d7;"></i></a><a class="social-icon" href="https://space.bilibili.com/425568077" target="_blank" title="Bilibili"><i class="fas fa-play-circle" style="color: #a992f0;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>お知らせ</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目次</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E9%83%A8%E5%88%86%EF%BC%9A%E5%8E%9F%E5%B7%A5%E7%A8%8B%E6%80%8E%E6%A0%B7%E8%AF%BB%E5%8F%96%E4%BD%A0%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="toc-number">1.</span> <span class="toc-text">第一部分：原工程怎样读取你的数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%8C%89%E5%BF%83%E6%9C%88%E7%8B%90%E7%9A%84%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F%EF%BC%8C%E5%88%B0%E5%BA%95%E6%9C%89%E5%87%A0%E5%BC%A0"><span class="toc-number">1.1.</span> <span class="toc-text">1. 按心月狐的组织方式，到底有几张</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%85%88%E7%BB%99%E6%A8%A1%E5%9E%8B%E5%88%86%E6%9D%90%E8%B4%A8%E3%80%81%E6%95%B4%E7%90%86UV"><span class="toc-number">1.2.</span> <span class="toc-text">2. 先给模型分材质、整理UV</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%B8%89%E5%A5%97%E8%A1%A3%E6%9C%8D%EF%BC%9A%E6%AF%8F%E5%A5%97%E5%9B%9B%E5%BC%A0%EF%BC%8C%E5%88%86%E5%88%AB%E6%80%8E%E4%B9%88%E5%81%9A"><span class="toc-number">1.3.</span> <span class="toc-text">3. 三套衣服：每套四张，分别怎么做</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-D%EF%BC%9ARGB%E9%A2%9C%E8%89%B2%EF%BC%8CAlpha%E9%97%AD%E5%A1%9E-%E5%8F%91%E5%85%89"><span class="toc-number">1.3.1.</span> <span class="toc-text">3.1 D：RGB颜色，Alpha闭塞&#x2F;发光</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-N%EF%BC%9ARG%E6%B3%95%E7%BA%BF%EF%BC%8CAlpha%E7%B2%97%E7%B3%99%E5%BA%A6"><span class="toc-number">1.3.2.</span> <span class="toc-text">3.2 N：RG法线，Alpha粗糙度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-FTM%EF%BC%9AR%E9%80%8F%E6%98%8E%EF%BC%8CG%E9%87%91%E5%B1%9E%EF%BC%8CB%E6%88%98%E6%8D%9F"><span class="toc-number">1.3.3.</span> <span class="toc-text">3.3 FTM：R透明，G金属，B战损</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-RGID%EF%BC%9A%E4%BD%8E%E7%81%B0%E5%BA%A6%E5%88%86%E5%8C%BA%E7%BC%96%E5%8F%B7"><span class="toc-number">1.3.4.</span> <span class="toc-text">3.4 RGID：低灰度分区编号</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-%E4%B8%89%E5%A5%97%E8%A1%A3%E6%9C%8D%E7%9A%84%E5%85%B7%E4%BD%93%E5%9B%BE%E7%89%87%E5%85%A5%E5%8F%A3"><span class="toc-number">1.3.5.</span> <span class="toc-text">3.5 三套衣服的具体图片入口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-6-Up-FX%EF%BC%9A%E5%9F%BA%E7%A1%80%E5%9B%9B%E5%BC%A0%E4%B9%8B%E5%A4%96%E7%9A%84%E6%B5%81%E5%8A%A8%E5%8F%91%E5%85%89"><span class="toc-number">1.3.6.</span> <span class="toc-text">3.6 Up_FX：基础四张之外的流动发光</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%84%B8%EF%BC%9AD%E3%80%81SDF%E3%80%81HET%E5%88%86%E5%88%AB%E8%B4%9F%E8%B4%A3%E4%BB%80%E4%B9%88"><span class="toc-number">1.4.</span> <span class="toc-text">4. 脸：D、SDF、HET分别负责什么</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#4-1-Face-D"><span class="toc-number">1.4.1.</span> <span class="toc-text">4.1 Face_D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-2-Face-SDF%EF%BC%9A%E9%9A%8F%E5%85%89%E8%A7%92%E5%BA%A6%E6%94%B9%E5%8F%98%E7%9A%84%E9%98%B4%E5%BD%B1%E9%98%88%E5%80%BC"><span class="toc-number">1.4.2.</span> <span class="toc-text">4.2 Face_SDF：随光角度改变的阴影阈值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-3-Face-HET%EF%BC%9A%E4%BE%9Beye-mask%E5%92%8C%E5%B1%80%E9%83%A8%E8%B0%83%E8%89%B2%E4%BD%BF%E7%94%A8"><span class="toc-number">1.4.3.</span> <span class="toc-text">4.3 Face_HET：供eye_mask和局部调色使用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E5%88%98%E6%B5%B7%E5%92%8C%E5%90%8E%E5%8F%91%EF%BC%9AD%E3%80%81FTM%E3%80%81HM%E3%80%81HN"><span class="toc-number">1.5.</span> <span class="toc-text">5. 刘海和后发：D、FTM、HM、HN</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#5-1-Hair-Bangs-D"><span class="toc-number">1.5.1.</span> <span class="toc-text">5.1 Hair&#x2F;Bangs_D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-2-HM%EF%BC%9A%E4%B8%89%E8%B7%AF%E4%B8%8D%E5%90%8C%E7%9A%84%E7%BE%8E%E6%9C%AF%E6%8E%A7%E5%88%B6"><span class="toc-number">1.5.2.</span> <span class="toc-text">5.2 HM：三路不同的美术控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-3-HN%EF%BC%9A%E5%BD%93%E5%89%8D%E9%AB%98%E5%85%89%E8%AF%BB%E5%8F%96G%EF%BC%8C%E4%B8%8D%E6%98%AF%E6%99%AE%E9%80%9A%E6%B3%95%E7%BA%BF"><span class="toc-number">1.5.3.</span> <span class="toc-text">5.3 HN：当前高光读取G，不是普通法线</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-4-FTM%EF%BC%9A%E4%B8%BB%E8%A6%81%E8%AF%BBR%E5%8F%82%E4%B8%8E%E5%88%98%E6%B5%B7NPR%E9%80%8F%E6%98%8E"><span class="toc-number">1.5.4.</span> <span class="toc-text">5.4 FTM：主要读R参与刘海NPR透明</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-5-HR%EF%BC%9A%E5%85%B1%E4%BA%AB%E7%9A%84%E9%AB%98%E5%85%89%E8%89%B2%E5%B8%A6"><span class="toc-number">1.5.5.</span> <span class="toc-text">5.5 HR：共享的高光色带</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-6-%E6%A0%B9%E6%9D%90%E8%B4%A8%E5%85%A5%E5%8F%A3"><span class="toc-number">1.5.6.</span> <span class="toc-text">5.6 根材质入口</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-%E7%9C%BC%E7%9D%9B%EF%BC%9AD%E3%80%81HET%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%8F%AF%E5%A4%8D%E7%94%A8%E7%9A%84%E9%AB%98%E5%85%89%E8%B5%84%E6%BA%90"><span class="toc-number">1.6.</span> <span class="toc-text">6. 眼睛：D、HET，以及可复用的高光资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%B0%BE%E5%B7%B4%EF%BC%9A%E5%85%88%E5%88%86%E6%B8%85%E6%99%AE%E9%80%9A%E8%A1%A8%E9%9D%A2%E5%92%8C%E4%BD%93%E7%A7%AF%E6%AF%9B"><span class="toc-number">1.7.</span> <span class="toc-text">7. 尾巴：先分清普通表面和体积毛</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E8%BA%AB%E4%BD%93%E3%80%81%E7%9C%89%E7%9D%AB%E3%80%81%E6%8F%8F%E8%BE%B9%E4%B8%8E%E7%81%AF%E5%85%89"><span class="toc-number">1.8.</span> <span class="toc-text">8. 身体、眉睫、描边与灯光</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E5%AF%BC%E5%87%BA%E4%B8%8E%E6%8E%A5%E5%85%A5%E7%9A%84%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B"><span class="toc-number">1.9.</span> <span class="toc-text">9. 导出与接入的一次完整流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E9%AA%8C%E6%94%B6%E6%97%B6%E9%80%90%E9%A1%B9%E7%9C%8B%E4%BB%80%E4%B9%88"><span class="toc-number">1.10.</span> <span class="toc-text">10. 验收时逐项看什么</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E9%83%A8%E5%88%86%EF%BC%9A%E6%80%8E%E6%A0%B7%E4%BB%8E%E6%BA%90%E5%9B%BE%E5%92%8C%E6%A8%A1%E5%9E%8B%E5%81%9A%E5%87%BA%E8%BF%99%E4%BA%9B%E6%95%B0%E6%8D%AE"><span class="toc-number">2.</span> <span class="toc-text">第二部分：怎样从源图和模型做出这些数据</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E5%87%86%E5%A4%87%E5%93%AA%E4%BA%9B%E5%B7%A5%E4%BD%9C%E6%96%87%E4%BB%B6"><span class="toc-number">2.1.</span> <span class="toc-text">1. 先准备哪些工作文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%AD%A3%E7%A1%AE%E7%9A%84%E5%88%B6%E4%BD%9C%E5%85%88%E5%90%8E%E9%A1%BA%E5%BA%8F"><span class="toc-number">2.2.</span> <span class="toc-text">2. 正确的制作先后顺序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E8%A1%A3%E6%9C%8DD%EF%BC%9A%E6%80%8E%E6%A0%B7%E7%94%BB%E5%9B%BA%E6%9C%89%E8%89%B2%E5%92%8C%E9%97%AD%E5%A1%9E"><span class="toc-number">2.3.</span> <span class="toc-text">3. 衣服D：怎样画固有色和闭塞</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RGB%E5%B7%A5%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">2.3.1.</span> <span class="toc-text">RGB工作方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Alpha%E5%B7%A5%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">2.3.2.</span> <span class="toc-text">Alpha工作方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E8%A1%A3%E6%9C%8DN%EF%BC%9A%E6%B3%95%E7%BA%BF%E5%92%8C%E7%B2%97%E7%B3%99%E5%BA%A6%E6%80%8E%E6%A0%B7%E5%81%9A"><span class="toc-number">2.4.</span> <span class="toc-text">4. 衣服N：法线和粗糙度怎样做</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E7%83%98%E7%84%99%E6%99%AE%E9%80%9A%E5%88%87%E7%BA%BF%E6%B3%95%E7%BA%BF%E6%BA%90%E5%9B%BE"><span class="toc-number">2.4.1.</span> <span class="toc-text">先烘焙普通切线法线源图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%82%E9%85%8D%E8%BF%99%E5%A5%97N%E5%85%A5%E5%8F%A3"><span class="toc-number">2.4.2.</span> <span class="toc-text">适配这套N入口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E7%8B%AC%E5%88%B6%E4%BD%9C%E7%B2%97%E7%B3%99%E5%BA%A6"><span class="toc-number">2.4.3.</span> <span class="toc-text">单独制作粗糙度</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E8%A1%A3%E6%9C%8DFTM%EF%BC%9A%E4%B8%89%E5%BC%A0%E5%B7%A5%E4%BD%9C%E9%81%AE%E7%BD%A9%E5%90%88%E6%88%90%E4%B8%80%E5%BC%A0"><span class="toc-number">2.5.</span> <span class="toc-text">5. 衣服FTM：三张工作遮罩合成一张</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#R%E4%B8%8D%E9%80%8F%E6%98%8E%E5%BA%A6"><span class="toc-number">2.5.1.</span> <span class="toc-text">R不透明度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#G%E9%87%91%E5%B1%9E%E5%BA%A6"><span class="toc-number">2.5.2.</span> <span class="toc-text">G金属度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#B%E6%88%98%E6%8D%9F"><span class="toc-number">2.5.3.</span> <span class="toc-text">B战损</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-RGID%EF%BC%9A%E4%BB%8E%E6%A8%A1%E5%9E%8B%E6%9D%90%E8%B4%A8%E5%88%86%E5%8C%BA%E5%88%B6%E4%BD%9C%E7%BC%96%E5%8F%B7%E5%9B%BE"><span class="toc-number">2.6.</span> <span class="toc-text">6. RGID：从模型材质分区制作编号图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E8%84%B8D%E3%80%81SDF%E4%B8%8EFace-HET%E7%9A%84%E5%88%B6%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">2.7.</span> <span class="toc-text">7. 脸D、SDF与Face_HET的制作方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Face-D"><span class="toc-number">2.7.1.</span> <span class="toc-text">Face_D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%8E%E9%98%B4%E5%BD%B1%E8%AE%BE%E8%AE%A1%E5%88%B6%E4%BD%9CSDF"><span class="toc-number">2.7.2.</span> <span class="toc-text">从阴影设计制作SDF</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Face-HET"><span class="toc-number">2.7.3.</span> <span class="toc-text">Face_HET</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E5%A4%B4%E5%8F%91D%E3%80%81HM%E3%80%81HN%E4%B8%8EHR%E6%80%8E%E6%A0%B7%E5%88%B6%E4%BD%9C"><span class="toc-number">2.8.</span> <span class="toc-text">8. 头发D、HM、HN与HR怎样制作</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%88%E6%95%B4%E7%90%86%E9%80%82%E5%90%88%E7%BB%98%E5%88%B6%E7%9A%84%E5%A4%B4%E5%8F%91UV"><span class="toc-number">2.8.1.</span> <span class="toc-text">先整理适合绘制的头发UV</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Hair-Bangs-D"><span class="toc-number">2.8.2.</span> <span class="toc-text">Hair&#x2F;Bangs_D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HM-R%EF%BC%9A%E9%AB%98%E5%85%89%E5%85%81%E8%AE%B8%E5%8C%BA"><span class="toc-number">2.8.3.</span> <span class="toc-text">HM.R：高光允许区</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HM-G%EF%BC%9A%E5%B1%80%E9%83%A8%E4%BA%8C%E5%88%86%E5%81%8F%E7%A7%BB"><span class="toc-number">2.8.4.</span> <span class="toc-text">HM.G：局部二分偏移</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HM-B%EF%BC%9A%E5%B1%80%E9%83%A8%E9%AB%98%E5%85%89%E6%9B%B2%E7%BA%BF%E5%BD%A2%E7%8A%B6"><span class="toc-number">2.8.5.</span> <span class="toc-text">HM.B：局部高光曲线形状</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HN-G%EF%BC%9A%E9%AB%98%E5%85%89%E8%BE%93%E5%85%A5%E5%9C%BA"><span class="toc-number">2.8.6.</span> <span class="toc-text">HN.G：高光输入场</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Hair-Bangs-FTM"><span class="toc-number">2.8.7.</span> <span class="toc-text">Hair&#x2F;Bangs_FTM</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#HR%E8%89%B2%E5%B8%A6"><span class="toc-number">2.8.8.</span> <span class="toc-text">HR色带</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E7%9C%BC%E7%9D%9B%E9%80%82%E9%85%8D%E4%B8%8E%E6%8F%90%E4%BA%AE%E5%AE%9E%E6%93%8D"><span class="toc-number">2.9.</span> <span class="toc-text">9. 眼睛适配与提亮实操</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#9-1-%E5%85%88%E6%89%BE%E5%88%B0%E7%9C%9F%E6%AD%A3%E7%9A%84%E7%9C%BC%E7%9D%9B%E9%9D%A2%E5%92%8C%E6%9D%90%E8%B4%A8%E6%A7%BD"><span class="toc-number">2.9.1.</span> <span class="toc-text">9.1 先找到真正的眼睛面和材质槽</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-2-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8D%A2%E4%BA%86%E9%A2%9C%E8%89%B2%E5%9B%BE%EF%BC%8C%E8%BF%98%E9%9C%80%E8%A6%81%E9%80%82%E9%85%8DUV"><span class="toc-number">2.9.2.</span> <span class="toc-text">9.2 为什么换了颜色图，还需要适配UV</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-3-%E8%A7%86%E5%B7%AE%E6%80%8E%E6%A0%B7%E5%9B%9E%E5%88%B0%E5%A4%B4%E9%83%A8%E9%A2%9C%E8%89%B2%E5%9B%BE"><span class="toc-number">2.9.3.</span> <span class="toc-text">9.3 视差怎样回到头部颜色图</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-4-HET%E6%80%8E%E6%A0%B7%E5%81%9A%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B2%A1%E6%9C%89%E5%8F%A6%E5%A4%96%E7%94%BB%E4%B8%80%E5%BC%A0Eye-D"><span class="toc-number">2.9.4.</span> <span class="toc-text">9.4 HET怎样做，为什么没有另外画一张Eye_D</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-5-%E5%85%88%E5%88%86%E6%B8%85%E4%B8%89%E7%A7%8D%E9%AB%98%E5%85%89%EF%BC%8C%E6%89%8D%E7%9F%A5%E9%81%93%E8%AF%A5%E8%B0%83%E5%93%AA%E9%87%8C"><span class="toc-number">2.9.5.</span> <span class="toc-text">9.5 先分清三种高光，才知道该调哪里</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-6-%E9%AB%98%E5%85%89%E7%89%87%E5%8F%91%E7%81%B0%EF%BC%9A%E8%BF%99%E6%AC%A1%E5%85%B7%E4%BD%93%E6%94%B9%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">2.9.6.</span> <span class="toc-text">9.6 高光片发灰：这次具体改了什么</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-7-%E8%99%B9%E8%86%9C%E4%B8%8D%E4%BA%AE%EF%BC%9A%E8%BF%99%E6%AC%A1%E5%A2%9E%E5%8A%A0%E7%9A%84%E6%9C%80%E4%BD%8E%E4%BA%AE%E5%BA%A6"><span class="toc-number">2.9.7.</span> <span class="toc-text">9.7 虹膜不亮：这次增加的最低亮度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-8-%E7%BB%99%E8%87%AA%E5%B7%B1%E7%9A%84%E6%96%B0%E7%9C%BC%E7%9D%9B%E5%9B%BE%E6%80%8E%E6%A0%B7%E7%BB%98%E5%88%B6"><span class="toc-number">2.9.8.</span> <span class="toc-text">9.8 给自己的新眼睛图怎样绘制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#9-9-%E6%AF%8F%E6%AC%A1%E6%8E%A5%E6%96%B0%E7%9C%BC%E7%9D%9B%EF%BC%8C%E6%8C%89%E8%BF%99%E4%B8%AA%E9%A1%BA%E5%BA%8F%E6%A3%80%E6%9F%A5"><span class="toc-number">2.9.9.</span> <span class="toc-text">9.9 每次接新眼睛，按这个顺序检查</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-Up-FX%E4%B8%8E%E5%B0%BE%E5%B7%B4%E9%99%84%E5%8A%A0%E5%9B%BE"><span class="toc-number">2.10.</span> <span class="toc-text">10. Up_FX与尾巴附加图</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Up-FX"><span class="toc-number">2.10.1.</span> <span class="toc-text">Up_FX</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tail-D%E4%B8%8ETail-ID"><span class="toc-number">2.10.2.</span> <span class="toc-text">Tail_D与Tail_ID</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Tail-RGID%E4%B8%8E%E8%A7%92%E8%89%B2-M"><span class="toc-number">2.10.3.</span> <span class="toc-text">Tail_RGID与角色_M</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#FurHeight%E4%B8%8EFlow"><span class="toc-number">2.10.4.</span> <span class="toc-text">FurHeight与Flow</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-%E6%A8%A1%E5%9E%8B%E6%B3%95%E7%BA%BF%EF%BC%9A%E5%9B%9B%E7%A7%8D%E7%9B%B8%E5%85%B3%E6%95%B0%E6%8D%AE%E6%80%8E%E6%A0%B7%E5%8C%BA%E5%88%86"><span class="toc-number">2.11.</span> <span class="toc-text">11. 模型法线：四种相关数据怎样区分</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%87%A0%E4%BD%95%E4%B8%8E%E7%9D%80%E8%89%B2%E6%B3%95%E7%BA%BF%E7%9A%84%E5%88%B6%E4%BD%9C"><span class="toc-number">2.11.1.</span> <span class="toc-text">几何与着色法线的制作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%87%E7%BA%BF%E5%92%8C%E5%89%AF%E5%88%87%E7%BA%BF"><span class="toc-number">2.11.2.</span> <span class="toc-text">切线和副切线</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#12-UV0-UV1-UV2-UV3%E5%90%84%E8%87%AA%E6%80%8E%E6%A0%B7%E5%87%86%E5%A4%87"><span class="toc-number">2.12.</span> <span class="toc-text">12. UV0&#x2F;UV1&#x2F;UV2&#x2F;UV3各自怎样准备</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#UV0%E5%88%B6%E4%BD%9C%E5%8E%9F%E5%88%99"><span class="toc-number">2.12.1.</span> <span class="toc-text">UV0制作原则</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UV1%E6%8F%8F%E8%BE%B9%E7%BC%96%E7%A0%81%E7%9A%84%E5%AE%8C%E6%95%B4%E6%80%9D%E8%B7%AF"><span class="toc-number">2.12.2.</span> <span class="toc-text">UV1描边编码的完整思路</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UV2%E5%88%B6%E4%BD%9C%E5%8E%9F%E5%88%99"><span class="toc-number">2.12.3.</span> <span class="toc-text">UV2制作原则</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-COL0%E3%80%81%E9%80%8F%E6%98%8E%E4%BF%AE%E6%AD%A3%E3%80%81ID%E3%80%81%E6%AF%9B%E5%B1%82%E5%B1%9E%E6%80%A7%E6%80%8E%E6%A0%B7%E5%81%9A"><span class="toc-number">2.13.</span> <span class="toc-text">13. COL0、透明修正、ID、毛层属性怎样做</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#COL0%E9%A1%B6%E7%82%B9%E8%89%B2"><span class="toc-number">2.13.1.</span> <span class="toc-text">COL0顶点色</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%8F%E8%BE%B9%E6%8E%92%E9%99%A4"><span class="toc-number">2.13.2.</span> <span class="toc-text">描边排除</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E6%95%B0ID%EF%BC%8C%E5%92%8CRGID%E5%9B%BE%E5%8C%BA%E5%88%AB%E5%BC%80"><span class="toc-number">2.13.3.</span> <span class="toc-text">整数ID，和RGID图区别开</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%8F%E6%98%8E%E4%BF%AE%E6%AD%A3"><span class="toc-number">2.13.4.</span> <span class="toc-text">透明修正</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#layer%E3%80%81sm-nor%E4%B8%8E%E6%AF%9B"><span class="toc-number">2.13.5.</span> <span class="toc-text">layer、sm_nor与毛</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-%E7%BB%99%E8%87%AA%E5%B7%B1%E6%96%B0%E8%A7%92%E8%89%B2%E7%9A%84%E4%B8%80%E6%AC%A1%E7%BB%83%E4%B9%A0%E4%BB%BB%E5%8A%A1"><span class="toc-number">2.14.</span> <span class="toc-text">14. 给自己新角色的一次练习任务</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%97%B6%E4%BF%9D%E7%95%99%E7%9A%84%E8%AE%B0%E5%BD%95"><span class="toc-number">3.</span> <span class="toc-text">使用时保留的记录</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最近の記事</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/10/xin-yue-hu-texture-model-guide/" title="心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南"><img src="/img/xin-yue-hu-texture-model-guide/00-workflow.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南"/></a><div class="content"><a class="title" href="/2026/10/xin-yue-hu-texture-model-guide/" title="心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南">心月狐渲染模板：模型师的贴图、SDF、法线与 UV 制作指南</a><time datetime="2026-10-08T12:00:00.000Z" title="作成日 2026-10-08 20:00:00">2026-10-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"><img src="/img/cover-alt.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき"/></a><div class="content"><a class="title" href="/2026/08/blender-bmesh-free/" title="【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき">【Blender】メモリクラッシュとの戦い — bm.clear() は bm.free() にすべき</a><time datetime="2026-08-30T10:00:00.000Z" title="作成日 2026-08-30 18:00:00">2026-08-30</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました"><img src="/img/cover-default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="はじめまして — 作品集ブログ始めました"/></a><div class="content"><a class="title" href="/2026/08/hello-portfolio/" title="はじめまして — 作品集ブログ始めました">はじめまして — 作品集ブログ始めました</a><time datetime="2026-08-30T09:30:00.000Z" title="作成日 2026-08-30 17:30:00">2026-08-30</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Dongyun Megumi</span></div><div class="footer_custom_text">忘れられないように、うまくなりたい ✿ Mochimochi.</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="読書モード"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="ライトモード/ダークモード切り替え"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="シングルカラムとダブルカラムの切り替え"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目次"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="トップに戻る"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/characters/assets/vendor/lucide.min.js" defer></script><script src="/characters/character-cards.js" defer></script><script src="/js/character-home-entry.js" defer></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
